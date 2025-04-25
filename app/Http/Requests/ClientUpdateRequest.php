@@ -5,8 +5,14 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property mixed $longitude
+ */
 class ClientUpdateRequest extends FormRequest
 {
+    public mixed $latitude;
+    public mixed $area;
+
     /**
      * Determine if the user is authorized to make this request.
      */
