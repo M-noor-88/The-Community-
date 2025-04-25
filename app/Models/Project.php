@@ -64,4 +64,9 @@ class Project extends Model
     {
         return $this->hasMany(CampaignParticipant::class);
     }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
 }
