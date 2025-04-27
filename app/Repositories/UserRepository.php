@@ -14,6 +14,8 @@ class UserRepository
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'device_token' => $data['device_token'] ?? null,
+            'verification_code' => $data['verification_code'],
+            'verification_expires_at' => $data['verification_expires_at'],
         ]);
 
         $user->assignRole('client');
