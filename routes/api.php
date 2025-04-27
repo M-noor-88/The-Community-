@@ -13,10 +13,14 @@ Route::get('/user', function (Request $request) {
 Route::prefix('client')
     ->controller(AuthController::class)
     ->group(function () {
-    Route::post('register', 'register');
-    Route::post('login', 'login');
-    Route::post('logout', 'logout')->middleware('auth:sanctum');
-});
+        Route::post('initiate_registration','initiate_registration');
+        Route::post('confirm_registration', 'confirm_registration');
+        Route::post('resend_code', 'resend_code');
+        Route::post('reset_password', 'reset_password');
+        Route::post('confirm_reset_password','confirm_reset_password');
+        Route::post('login', 'login');
+        Route::post('logout', 'logout')->middleware('auth:sanctum');
+    });
 
 
 // Profile Client
