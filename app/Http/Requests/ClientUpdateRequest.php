@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 /**
  * @property mixed $longitude
@@ -11,6 +10,7 @@ use Illuminate\Validation\Rule;
 class ClientUpdateRequest extends FormRequest
 {
     public mixed $latitude;
+
     public mixed $area;
 
     /**

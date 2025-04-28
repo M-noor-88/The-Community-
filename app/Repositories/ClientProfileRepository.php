@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\ClientProfile;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 
 class ClientProfileRepository
 {
@@ -22,21 +21,21 @@ class ClientProfileRepository
 
     public function syncSkillsAndFields($profile, array $skills = [], array $fields = []): void
     {
-        if (!empty($skills)) {
+        if (! empty($skills)) {
             $profile->skills()->sync($skills);
             $profile->save();
         }
 
-        if (!empty($fields)) {
+        if (! empty($fields)) {
             $profile->fields()->sync($fields);
             $profile->save();
         }
     }
 
-
     public function update(ClientProfile $profile, array $data): ClientProfile
     {
         $profile->update($data);
+
         return $profile;
     }
 

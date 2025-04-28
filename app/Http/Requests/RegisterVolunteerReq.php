@@ -23,8 +23,8 @@ class RegisterVolunteerReq extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'email'=> 'required|email|unique:users',
-            'password'=> 'required|string|min:6|confirmed',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:6|confirmed',
             'phone' => 'required|string',
             'experience_years' => 'nullable|int',
             'bio' => 'nullable|string|max:255',

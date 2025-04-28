@@ -2,22 +2,20 @@
 
 namespace App\Services;
 
+use App\Http\Requests\RegisterRequest;
 use App\Repositories\AuthRepository;
 use App\Repositories\ClientProfileRepository;
 use App\Repositories\ImageRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\VolunteerProfileRepository;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Services\MailService;
-use Carbon\Carbon;
 
 class AuthService
 {
-
-
     public function __construct(
         protected MailService $mailService,
         protected UserRepository $userRepo,
@@ -28,10 +26,10 @@ class AuthService
         protected AuthRepository $authRepository
     ) {}
 
-    public function initiate_registration(Request $request)
+    public function initiate_registration(RegisterRequest $request): void
     {
 
-        $verification_expires_at=now()->addMinutes(3);
+        $verification_expires_at = now()->addMinutes(3);
         $verification_code = rand(100000, 999999);
 
         $register_Data = [];
@@ -50,54 +48,58 @@ class AuthService
         $register_Data['area'] = $request->area;
         $register_Data['skills'] = $request->skills;
         $register_Data['volunteer_fields'] = $request->volunteer_fields;
-        $register_Data['image'] = $request->image;
+
+        //  Handle the image properly
+        if ($request->hasFile('image')) {
+            $image = $this->imageRepo->createPlaceholder();
+            $this->imageRepo->storeTempImageAndDispatch($request['image'], $image->id);
+
+            $register_Data['image_id'] = $image->id; // Save only the image ID
+        }
 
         $this->authRepository->initiateRegistration($register_Data);
         $this->mailService->sendVerificationEmail([
             'verification_code' => $register_Data['verification_code'],
-            'verification_expires_at' =>$register_Data['verification_expires_at'],
-            'email' => $register_Data['email']
+            'verification_expires_at' => $register_Data['verification_expires_at'],
+            'email' => $register_Data['email'],
         ]);
 
-        return;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function register(Request $request)
     {
 
-        $data=$this->authRepository->getUserData($request['email']);
+        $data = $this->authRepository->getUserData($request['email']);
 
-        if(!$data){
-            throw new \Exception('Invalid verification code');
+        if (! $data) {
+            throw new Exception('Invalid verification code');
         }
 
         if ($data['verification_code'] != $request['code']) {
-            throw new \Exception('Invalid verification code');
+            throw new Exception('Invalid verification code');
         }
 
         if (now()->isAfter(Carbon::parse($data['verification_expires_at']))) {
             $this->authRepository->deleteUserData($request['email']);
             throw new \Exception('Verification code has expired');
         }
-         $client=$this->Client($data);
-         return $client;
+
+        return $this->Client($data);
     }
 
     public function Client(array $data)
     {
-        DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data) {
 
             $user = $this->userRepo->createClient($data);
-            $locationId = (!empty($data['latitude']) && !empty($data['longitude']))
+            $locationId = (! empty($data['latitude']) && ! empty($data['longitude']))
             ? $this->locationRepo->create($data)
             : 1;
 
-            $image = $this->imageRepo->createPlaceholder();
-            if (isset($data['image'])) {
-                $this->imageRepo->storeTempImageAndDispatch($data['image'], $image->id);
-            }
-
-            $profile = $this->clientProfileRepo->create($user, $data, $locationId, $image->id);
+            $profile = $this->clientProfileRepo->create($user, $data, $locationId, $data['image_id']);
 
             $this->clientProfileRepo->syncSkillsAndFields(
                 $profile,
@@ -112,15 +114,17 @@ class AuthService
         });
     }
 
-    public function resend_code($email)
+    /**
+     * @throws Exception
+     */
+    public function resend_code($email): void
     {
-        $data=$this->authRepository->getUserData($email);
-
-        if(!$data){
-            throw new \Exception('Invalid verification code');
+        $data = $this->authRepository->getUserData($email);
+        if (! $data) {
+            throw new Exception('Invalid verification code');
         }
 
-        $verification_expires_at=now()->addMinutes(3)->toDateTimeString();
+        $verification_expires_at = now()->addMinutes(3)->toDateTimeString();
         $data['verification_expires_at'] = $verification_expires_at;
 
         $data['verification_code'] = rand(100000, 999999);
@@ -129,42 +133,43 @@ class AuthService
 
         $this->mailService->sendVerificationEmail([
             'verification_code' => $data['verification_code'],
-            'verification_expires_at' =>$data['verification_expires_at'],
+            'verification_expires_at' => $data['verification_expires_at'],
             'email' => $email,
         ]);
-        return;
+
     }
 
-    public function reset_password(Request $request)
+    public function reset_password(Request $request): void
     {
-        $reset_code=rand(100000, 999999);
-        $reset_expires_at=now()->addMinutes(3)->toDateTimeString();
+        $reset_code = rand(100000, 999999);
+        $reset_expires_at = now()->addMinutes(3)->toDateTimeString();
 
-        $data=[];
+        $data = [];
         $data['reset_code'] = $reset_code;
         $data['reset_expires_at'] = $reset_expires_at;
         $data['email'] = $request['email'];
 
         $this->authRepository->cacheResetCode($data);
 
-
         $this->mailService->sendResetPasswordEmail([
             'reset_code' => $reset_code,
-            'reset_expires_at' =>$reset_expires_at,
+            'reset_expires_at' => $reset_expires_at,
             'email' => $request->email,
         ]);
 
-        return;
     }
 
+    /**
+     * @throws Exception
+     */
     public function confirm_reset_password(Request $request)
     {
-        $data=$this->authRepository->getResetCode($request['email']);
+        $data = $this->authRepository->getResetCode($request['email']);
 
-        if (!$data) {
+        if (! $data) {
             throw new \Exception('Invalid reset code');
         }
-        if ($data['reset_code']!= $request['reset_code']) {
+        if ($data['reset_code'] != $request['reset_code']) {
             throw new \Exception('Invalid reset code2');
         }
         if (now()->isAfter(Carbon::parse($data['reset_expires_at']))) {
@@ -172,8 +177,7 @@ class AuthService
             throw new \Exception('Reset code has expired');
         }
 
-        $user=$this->authRepository->updatePassword($request->all());
-        return $user;
+        return $this->authRepository->updatePassword($request->all());
     }
 
     public function registerVolunteer(Request $request)

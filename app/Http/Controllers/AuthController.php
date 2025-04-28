@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\CheckEmailRequest;
 use App\Http\Requests\ConfirmRegistrationRequest;
 use App\Http\Requests\ConfirmResetRequest;
-use App\Http\Requests\CheckEmailRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\RegisterVolunteerReq;
 use App\Services\AuthService;
 use App\Traits\JsonResponseTrait;
@@ -17,7 +17,7 @@ class AuthController extends Controller
 {
     use JsonResponseTrait;
 
-    protected  $authService;
+    protected AuthService $authService;
 
     public function __construct(AuthService $authService)
     {
@@ -27,53 +27,57 @@ class AuthController extends Controller
     public function initiate_registration(RegisterRequest $request): JsonResponse
     {
         try {
-             $this->authService->initiate_registration($request);
-            return $this->success( 'data initiated successfully and verification code sent to your email');
+            $this->authService->initiate_registration($request);
+
+            return $this->success('data initiated successfully and verification code sent to your email');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
-    public function confirm_registration(ConfirmRegistrationRequest $request)
+    public function confirm_registration(ConfirmRegistrationRequest $request): JsonResponse
     {
         try {
             $data = $this->authService->register($request);
+
             return $this->success($data, 'Registered successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
-    public function resend_code(CheckEmailRequest $request)
+    public function resend_code(CheckEmailRequest $request): JsonResponse
     {
         try {
-            $data = $this->authService->resend_code($request['email']);
-            return $this->success($data, 'Verification code sent to your email');
+            $this->authService->resend_code($request['email']);
+
+            return $this->success([], 'Verification code sent to your email');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
-    public function reset_password(CheckEmailRequest $request)
+    public function reset_password(CheckEmailRequest $request): JsonResponse
     {
         try {
-            $data = $this->authService->reset_password($request);
-            return $this->success($data, 'the reset code sent to your email');
+            $this->authService->reset_password($request);
+
+            return $this->success([], 'the reset code sent to your email');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
-    public function confirm_reset_password(ConfirmResetRequest $request)
+    public function confirm_reset_password(ConfirmResetRequest $request): JsonResponse
     {
         try {
             $data = $this->authService->confirm_reset_password($request);
+
             return $this->success($data, 'Password reset successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
-
 
     // Register Volunteer
     public function registerVolunteer(RegisterVolunteerReq $request): JsonResponse

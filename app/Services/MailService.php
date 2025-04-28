@@ -1,12 +1,10 @@
 <?php
+
 namespace App\Services;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Google\Service\Gmail;
 use Google\Client;
+use Google\Service\Gmail;
 use Google\Service\Gmail\Message;
-use Illuminate\Support\Facades\Log;
 
 class MailService
 {
@@ -14,7 +12,7 @@ class MailService
 
     public function __construct()
     {
-        $this->client = new Client();
+        $this->client = new Client;
         $this->client->setClientId(config('services.google.client_id'));
         $this->client->setClientSecret(config('services.google.client_secret'));
         $this->client->setRedirectUri(config('services.google.redirect_uri'));
@@ -29,49 +27,47 @@ class MailService
         $token = json_decode(env('GOOGLE_ACCESS_TOKEN'), true);
         $this->client->setAccessToken($token);
 
-          // Automatically refresh if expired
-    if ($this->client->isAccessTokenExpired()) {
-        $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-        $token = array_merge($token, $newToken);
-        $this->client->setAccessToken($token);
+        // Automatically refresh if expired
+        if ($this->client->isAccessTokenExpired()) {
+            $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+            $token = array_merge($token, $newToken);
+            $this->client->setAccessToken($token);
 
-    }
+        }
 
-
-        $gmail= new Gmail($this->client);
+        $gmail = new Gmail($this->client);
 
         $from = 'zed.kreshati.2001@gmail.com'; // your authorized sender (must match the authenticated Gmail account)
-        $to= $request['email'];
-        $subject= 'Google Authentication test';
+        $to = $request['email'];
+        $subject = 'Google Authentication test';
         // ✅ Render Blade view
-        $verification_code =$request['verification_code'];
+        $verification_code = $request['verification_code'];
 
         $htmlBody = view('google_auth', [
             'verification_code' => $verification_code,
-            'verification_expires_at' =>$request['verification_expires_at']
-            ])->render();
+            'verification_expires_at' => $request['verification_expires_at'],
+        ])->render();
 
         // Construct raw email
-        $rawMessageString  = "From: $from\r\n";
+        $rawMessageString = "From: $from\r\n";
         $rawMessageString .= "To: $to\r\n";
         $rawMessageString .= "Subject: $subject\r\n";
         $rawMessageString .= "MIME-Version: 1.0\r\n";
         $rawMessageString .= "Content-Type: text/html; charset=utf-8\r\n\r\n";
         $rawMessageString .= $htmlBody;
 
+        $rawMessage = base64_encode($rawMessageString);
+        $rawMessage = str_replace(['+', '/', '='], ['-', '_', ''], $rawMessage);
 
-        $rawMessage=base64_encode($rawMessageString);
-        $rawMessage= str_replace(['+', '/', '='], ['-', '_', ''], $rawMessage);
-
-        $message= new Message();
+        $message = new Message;
         $message->setRaw($rawMessage);
-
 
         try {
             $gmail->users_messages->send('me', $message);
+
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to send email: '.$e->getMessage()], 500);
         }
 
     }
@@ -81,48 +77,47 @@ class MailService
         $token = json_decode(env('GOOGLE_ACCESS_TOKEN'), true);
         $this->client->setAccessToken($token);
 
-          // Automatically refresh if expired
-    if ($this->client->isAccessTokenExpired()) {
-        $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-        $token = array_merge($token, $newToken);
-        $this->client->setAccessToken($token);
+        // Automatically refresh if expired
+        if ($this->client->isAccessTokenExpired()) {
+            $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+            $token = array_merge($token, $newToken);
+            $this->client->setAccessToken($token);
 
-    }
+        }
 
-        $gmail= new Gmail($this->client);
+        $gmail = new Gmail($this->client);
 
         $from = 'zed.kreshati.2001@gmail.com'; // your authorized sender (must match the authenticated Gmail account)
-        $to= $request['email'];
-        $subject= 'Reset Password ';
+        $to = $request['email'];
+        $subject = 'Reset Password ';
         // ✅ Render Blade view
-        $reset_code =$request['reset_code'];
+        $reset_code = $request['reset_code'];
 
         $htmlBody = view('Reset_password', [
             'reset_code' => $reset_code,
-            'reset_expires_at' =>$request['reset_expires_at']
-            ])->render();
+            'reset_expires_at' => $request['reset_expires_at'],
+        ])->render();
 
         // Construct raw email
-        $rawMessageString  = "From: $from\r\n";
+        $rawMessageString = "From: $from\r\n";
         $rawMessageString .= "To: $to\r\n";
         $rawMessageString .= "Subject: $subject\r\n";
         $rawMessageString .= "MIME-Version: 1.0\r\n";
         $rawMessageString .= "Content-Type: text/html; charset=utf-8\r\n\r\n";
         $rawMessageString .= $htmlBody;
 
+        $rawMessage = base64_encode($rawMessageString);
+        $rawMessage = str_replace(['+', '/', '='], ['-', '_', ''], $rawMessage);
 
-        $rawMessage=base64_encode($rawMessageString);
-        $rawMessage= str_replace(['+', '/', '='], ['-', '_', ''], $rawMessage);
-
-        $message= new Message();
+        $message = new Message;
         $message->setRaw($rawMessage);
-
 
         try {
             $gmail->users_messages->send('me', $message);
+
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to send email: '.$e->getMessage()], 500);
         }
     }
 }
