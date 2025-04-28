@@ -16,6 +16,4 @@ class LocationRepository
             'updated_at' => now(),
         ]);
     }
-
-
 }

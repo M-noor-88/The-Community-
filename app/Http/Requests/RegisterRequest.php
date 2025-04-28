@@ -4,6 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property mixed $image
+ */
 class RegisterRequest extends FormRequest
 {
     /**
@@ -35,7 +38,7 @@ class RegisterRequest extends FormRequest
             'area' => 'nullable|string|max:255',
             'skills' => 'nullable|json',
             'volunteer_fields' => 'nullable|json',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ];
 
     }

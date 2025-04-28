@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CheckEmailRequest;
+use App\Http\Requests\ConfirmRegistrationRequest;
+use App\Http\Requests\ConfirmResetRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\RegisterVolunteerReq;
 use App\Services\AuthService;
@@ -21,12 +24,56 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
-    public function register(RegisterRequest $request): JsonResponse
+    public function initiate_registration(RegisterRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->initiate_registration($request);
+
+            return $this->success('data initiated successfully and verification code sent to your email');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function confirm_registration(ConfirmRegistrationRequest $request): JsonResponse
     {
         try {
             $data = $this->authService->register($request);
 
             return $this->success($data, 'Registered successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function resend_code(CheckEmailRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->resend_code($request['email']);
+
+            return $this->success([], 'Verification code sent to your email');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function reset_password(CheckEmailRequest $request): JsonResponse
+    {
+        try {
+            $this->authService->reset_password($request);
+
+            return $this->success([], 'the reset code sent to your email');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function confirm_reset_password(ConfirmResetRequest $request): JsonResponse
+    {
+        try {
+            $data = $this->authService->confirm_reset_password($request);
+
+            return $this->success($data, 'Password reset successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
