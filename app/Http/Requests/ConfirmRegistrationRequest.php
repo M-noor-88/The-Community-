@@ -23,7 +23,7 @@ class ConfirmRegistrationRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'code' =>'required|integer|digits:6',
+            'code' => 'required|integer|digits:6',
         ];
 
     }

@@ -11,6 +11,7 @@ class Rating extends Model
     use HasFactory;
 
     protected $table = 'ratings';
+
     protected $fillable = ['project_id', 'user_id', 'rating', 'comment'];
 
     public function project(): BelongsTo
@@ -18,7 +19,7 @@ class Rating extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function user() : BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

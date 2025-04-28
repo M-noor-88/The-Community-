@@ -14,11 +14,13 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @method static create(array $array)
+ * @method static where(string $string, mixed $email)
+ *
  * @property mixed $id
  */
 class User extends Authenticatable
 {
-    use HasFactory, HasRoles , Notifiable , HasApiTokens;
+    use HasApiTokens, HasFactory , HasRoles , Notifiable;
 
     /**
      * The attributes that are mass assignable.

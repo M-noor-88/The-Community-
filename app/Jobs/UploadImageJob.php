@@ -24,25 +24,25 @@ class UploadImageJob implements ShouldQueue
      */
     public function __construct(
         protected string $tempPath,
-        protected int $img_id)
-    {}
+        protected int $img_id) {}
 
     /**
      * Execute the job.
+     *
      * @throws ApiError
      */
     public function handle(): void
     {
-        $localPath = storage_path('app/' . $this->tempPath);
+        $localPath = storage_path('app/'.$this->tempPath);
 
-        Log::info("Local Path" . $localPath . " TEST ");
+        Log::info('Local Path'.$localPath.' TEST ');
 
         Configuration::instance('cloudinary://516356163961216:pxiK5wQZFwZn8Cvh7kvCGTabzIA@df5wyvdtk?secure=true');
 
-        $publicId = 'images/' . Str::uuid();
+        $publicId = 'images/'.Str::uuid();
 
         // 🔽 RAW SDK Upload Method
-        $uploadedImage = (new UploadApi())->upload($localPath, [
+        $uploadedImage = (new UploadApi)->upload($localPath, [
             'folder' => 'secure_uploads',
             'public_id' => $publicId,
             'resource_type' => 'image',
