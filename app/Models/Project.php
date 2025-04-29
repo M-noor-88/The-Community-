@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @method static find($projectId)
+ *
+ * @property mixed $number_of_participant
+ * @property mixed $type
+ * @property mixed $status
+ * @property mixed $user
+ */
 class Project extends Model
 {
     use HasFactory;
@@ -25,9 +33,9 @@ class Project extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function image(): HasOne
+    public function image(): BelongsTo
     {
-        return $this->HasOne(Image::class);
+        return $this->belongsTo(Image::class);
     }
 
     public function category(): BelongsTo
