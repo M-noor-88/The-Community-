@@ -42,14 +42,17 @@ class ClientProfileController extends Controller
                 return $this->error('Profile not found', 404);
             }
 
-            if ($request->filled(['latitude', 'longitude'])) {
+            $validated = $request->validated();
+
+            if (isset($validated['latitude'], $validated['longitude'])) {
                 $locationData = [
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'name' => $request->area,
+                    'latitude' => $validated['latitude'],
+                    'longitude' => $validated['longitude'],
+                    'name' => $validated['area'] ?? null,
                 ];
                 $profile->location()->update($locationData);
             }
+
             $data = $request->only(['phone', 'age', 'gender', 'bio']);
             $skills = json_decode($request->skills ?? '[]', true);
             $fields = json_decode($request->volunteer_fields ?? '[]', true);

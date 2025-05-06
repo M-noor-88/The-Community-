@@ -31,6 +31,7 @@ class MailService
             return false;
         }
 
+
         $token = json_decode(file_get_contents($tokenPath), true);
         $this->client->setAccessToken($token);
 
@@ -39,6 +40,7 @@ class MailService
                 Log::error('Missing refresh_token.');
                 return false;
             }
+
 
             $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
             $token = array_merge($token, $newToken);
@@ -79,6 +81,7 @@ class MailService
         } catch (\Exception $e) {
             Log::error('Gmail Send Error: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
+
         }
     }
 
@@ -89,6 +92,8 @@ class MailService
             'verification_expires_at' => $request['verification_expires_at'],
         ], $request['email'], 'Google Authentication Test');
     }
+
+
 
     public function sendResetPasswordEmail(array $request)
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\CampaignParticipantService;
+use App\Services\ProjectService;
 use App\Traits\JsonResponseTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -13,7 +14,8 @@ class CampaignParticipantController extends Controller
     use JsonResponseTrait;
 
     public function __construct(
-        protected CampaignParticipantService $joinCampaignPartService
+        protected CampaignParticipantService $joinCampaignPartService,
+        protected ProjectService $projectService,
     ) {}
 
     public function joinToProject($projectId): JsonResponse
@@ -47,6 +49,17 @@ class CampaignParticipantController extends Controller
 
         try {
             $data = $this->joinCampaignPartService->updateJoinRequest($participantId, $request->status);
+
+            return $this->success($data);
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function myJoinedProjects(): JsonResponse
+    {
+        try {
+            $data = $this->projectService->getProjectsUserJoined();
 
             return $this->success($data);
         } catch (Exception $e) {
