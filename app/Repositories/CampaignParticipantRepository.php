@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\CampaignParticipant;
+use App\Models\Project;
 use Exception;
 
 class CampaignParticipantRepository
@@ -54,5 +55,15 @@ class CampaignParticipantRepository
         $participant->save();
 
         return $participant;
+    }
+
+    public function getProjectsUserJoined($userId)
+    {
+        return Project::whereHas('participants', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })
+            ->with(['category', 'location', 'image', 'ratings.user', 'user'])
+            ->latest()
+            ->get();
     }
 }

@@ -4,7 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\VotesController;
 use App\Http\Controllers\CampaignParticipantController;
+use App\Http\Controllers\GovernmentProjectController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RatesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -52,7 +54,14 @@ Route::prefix('client/project')
         Route::post('/nearby','getNearbyProjects')->middleware('auth:sanctum');
 
         // حملة رسمية فقط  show specific
-        Route::get('show/{projectId}' , 'show');
+        Route::get('show/{projectId}' , 'show')->middleware('auth:sanctum');
+
+        Route::get('/myProjects' , 'getMyProjects')->middleware('auth:sanctum');
+
+        Route::delete('/delete/{projectId}',  'destroy')->middleware('auth:sanctum');
+
+        // Recommendations
+        Route::post('/recommends' , 'recommendations')->middleware('auth:sanctum');
     });
 
 
@@ -62,6 +71,8 @@ Route::prefix('/project')
     ->controller(CampaignParticipantController::class)
     ->group(function (){
         Route::get('/join/{projectId}' , 'joinToProject')->middleware('auth:sanctum');
+
+        Route::get('/myJoined' , 'myJoinedProjects')->middleware('auth:sanctum');
     });
 
 
@@ -72,7 +83,9 @@ Route::prefix('client/project')
         Route::post('/vote/{projectId}' , 'vote')->middleware('auth:sanctum');
     });
 
-
+// Ratings
+// إضافة تقييم على مشروع منجز (حملة رسمية)
+Route::middleware('auth:sanctum')->post('/ratings', [RatesController::class,'addRateToProject']);
 
 
 
@@ -93,3 +106,23 @@ Route::middleware(['auth:sanctum'])->prefix('project')->controller(CampaignParti
     Route::get('/pending-joins', 'getPendingJoins');
     Route::post('/approve-join/{participantId}',  'approveJoinRequest');
 });
+
+// تحديث حالة الحملة الرسمية الى منجزة
+Route::middleware('auth:sanctum')
+    ->post('/volunteer/{projectId}/promote'  , [GovernmentProjectController::class , 'assignAsCompleted']);
+
+
+
+
+
+
+//------------------------------- Admin -------------------------------
+
+Route::middleware('auth:sanctum')
+    ->prefix('government/projects')
+    ->controller(GovernmentProjectController::class)
+    ->group(function () {
+    Route::get('/initiatives','index');
+    Route::post('/{projectId}/promote',  'promote');
+});
+

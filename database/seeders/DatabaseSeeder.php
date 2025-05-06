@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             SkillSeeder::class,
             VolunteerFieldSeeder::class,
             LocationAndImageSeeder::class,
-            RolesAndUsersSeeder::class
+            RolesAndUsersSeeder::class,
+            ProjectsCategorySeeder::class
         ]);
     }
 }

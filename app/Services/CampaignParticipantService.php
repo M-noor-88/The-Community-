@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\CampaignParticipantRepository;
 use App\Repositories\ProjectRepository;
+use App\Repositories\RecommendationRepository;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +12,8 @@ class CampaignParticipantService
 {
     public function __construct(
         protected ProjectRepository $projectRepository,
-        protected CampaignParticipantRepository $joinCampaignPartRepository
+        protected CampaignParticipantRepository $joinCampaignPartRepository,
+        protected RecommendationRepository $recommendRepo,
     ) {}
 
     /**
@@ -46,6 +48,8 @@ class CampaignParticipantService
                 ->createJoinParticipantWithStatus(
                     $projectId, $userID, 'انتظار');
         }
+
+        $this->recommendRepo->updateInterests($project->category->id , $userID , 3);
 
         return $data;
     }

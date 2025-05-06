@@ -5,6 +5,7 @@ namespace App\Services;
 use Google\Client;
 use Google\Service\Gmail;
 use Google\Service\Gmail\Message;
+use Illuminate\Support\Facades\Log;
 
 class MailService
 {
@@ -24,11 +25,13 @@ class MailService
     public function sendVerificationEmail(array $request)
     {
 
-        $token = json_decode(env('GOOGLE_ACCESS_TOKEN'), true);
+        $tokenPath = storage_path('app/google-access-token.json');
+        $token = json_decode(file_get_contents($tokenPath), true);
         $this->client->setAccessToken($token);
 
         // Automatically refresh if expired
         if ($this->client->isAccessTokenExpired()) {
+
             $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
             $token = array_merge($token, $newToken);
             $this->client->setAccessToken($token);
@@ -63,14 +66,19 @@ class MailService
         $message->setRaw($rawMessage);
 
         try {
-            $gmail->users_messages->send('me', $message);
+          $sentMessage =  $gmail->users_messages->send('me', $message);
+            Log::info('Email sent successfully', ['messageId' => $sentMessage->getId()]);
 
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {
+            Log::error('Failed to send email', ['error' => $e->getMessage()]);
+
             return response()->json(['error' => 'Failed to send email: '.$e->getMessage()], 500);
         }
 
     }
+
+
 
     public function sendResetPasswordEmail(array $request)
     {

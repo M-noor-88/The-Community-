@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Repositories\RecommendationRepository;
 use App\Repositories\VoteRepository;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -10,10 +11,11 @@ use Illuminate\Support\Facades\Auth;
 class VoteService
 {
     protected VoteRepository $voteRepository;
-
-    public function __construct(VoteRepository $voteRepository)
+    protected RecommendationRepository $recommendRepo;
+    public function __construct(VoteRepository $voteRepository , RecommendationRepository $recommendRepo)
     {
         $this->voteRepository = $voteRepository;
+        $this->recommendRepo = $recommendRepo;
     }
 
     /**
@@ -30,6 +32,9 @@ class VoteService
         if ($project->type !== 'مبادرة') {
             throw new Exception('التصويت متاح فقط في المبادرات');
         }
+
+        $this->recommendRepo->updateInterests($project->category->id ,$userId , 2 );
+
 
         $this->voteRepository->storeVote($userId, $projectId, $value);
     }
