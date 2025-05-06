@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             LocationAndImageSeeder::class,
             RolesAndUsersSeeder::class,
             ComplaintsSeeder::class,
-
+            ProjectsCategorySeeder::class
         ]);
     }
 }

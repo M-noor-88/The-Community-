@@ -8,6 +8,7 @@ use App\Traits\JsonResponseTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -36,9 +37,10 @@ class ProjectController extends Controller
     {
         $request->validate([
             'type' => 'required',
+            'status' => 'nullable|in:ملغية,نشطة,منجزة',
         ]);
         try {
-            $projects = $this->projectService->getAllProjects($request->type);
+            $projects = $this->projectService->getAllProjects($request->type, $request->status);
 
             return $this->success($projects);
         } catch (Exception $e) {
@@ -49,12 +51,10 @@ class ProjectController extends Controller
     // جميع المشاريع , المبادرات أو الحملات الرسمية حسب التصنيف
     public function getProjectsByCategory($category_id, Request $request): JsonResponse
     {
+        $request->validate([
+            'type' => 'required|in:مبادرة,حملة رسمية',
+        ]);
         try {
-
-            $request->validate([
-                'type' => 'required|in:مبادرة,حملة رسمية',
-            ]);
-
             $projects = $this->projectService->getAllProjectsByCategoryAndType($category_id, $request->type);
 
             return $this->success($projects, 'جميع المشاريع حسب التصنيف');
@@ -95,6 +95,46 @@ class ProjectController extends Controller
 
         } catch (Exception $e) {
             return $this->error($e->getMessage());
+        }
+    }
+
+    public function getMyProjects(): JsonResponse
+    {
+        try {
+            $data = $this->projectService->myProjects();
+
+            return $this->success($data, 'جميع المشاريع');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function destroy($projectId): JsonResponse
+    {
+        try {
+            $this->projectService->deleteInitiativeProject($projectId, Auth::id());
+
+            return $this->success(message: 'تم حذف المبادرة بنجاح');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage(), 403);
+        }
+    }
+
+
+    // Recommend projects based on user behaviour | you can filter by status
+    public function recommendations(Request $request): JsonResponse
+    {
+        $request->validate([
+            'status' => 'nullable|in:نشطة,منجزة',
+            'type' => 'nullable|in:حملة رسمية,مبادرة'
+        ]);
+
+        try {
+            $data = $this->projectService->getRecommendation($request->status , $request->type);
+            return $this->success($data , "مشاريع مقترحة لك بناءا على تفاعلاتك السابقة");
+        } catch(Exception $e)
+        {
+            return $this->error("Error Get recommendations ". $e->getMessage());
         }
     }
 }
