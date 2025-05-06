@@ -27,7 +27,7 @@ class RegisterRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => 'required|confirmed|string|min:6',
             'phone' => 'required|string',
             'age' => 'required|integer',
             'gender' => 'required|in:male,female',
@@ -38,7 +38,7 @@ class RegisterRequest extends FormRequest
             'area' => 'nullable|string|max:255',
             'skills' => 'nullable|json',
             'volunteer_fields' => 'nullable|json',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ];
 
     }

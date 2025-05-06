@@ -15,4 +15,11 @@ class Image extends Model
     protected $table = 'images';
 
     protected $fillable = ['image_url'];
+
+    public function complaints()
+    {
+        return $this->belongsToMany(Complaint::class, 'achievement_images');
+    }
+
+
 }

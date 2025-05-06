@@ -39,4 +39,10 @@ class Complaint extends Model
     {
         return $this->hasMany(CampaignParticipant::class);
     }
+
+    public function achievementImages()
+    {
+        return $this->belongsToMany(Image::class, 'achievement_images');
+    }
+
 }
