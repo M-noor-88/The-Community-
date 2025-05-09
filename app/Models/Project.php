@@ -8,6 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @method static find($projectId)
+ *
+ * @property mixed $number_of_participant
+ * @property mixed $type
+ * @property mixed $status
+ * @property mixed $user
+ * @property mixed $description
+ * @property mixed $Execution_date
+ * @property mixed $image
+ */
 class Project extends Model
 {
     use HasFactory;
@@ -16,7 +27,7 @@ class Project extends Model
 
     protected $fillable = [
         'user_id', 'image_id', 'category_id', 'location_id',
-        'number_of_participant', 'title', 'description',
+        'number_of_participant', 'title', 'description', 'Execution_date',
         'type', 'status', 'created_by', 'stripe_account_id',
     ];
 
@@ -25,9 +36,9 @@ class Project extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function image(): HasOne
+    public function image(): BelongsTo
     {
-        return $this->HasOne(Image::class);
+        return $this->belongsTo(Image::class);
     }
 
     public function category(): BelongsTo

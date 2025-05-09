@@ -49,11 +49,15 @@ class AuthService
         $register_Data['skills'] = $request->skills;
         $register_Data['volunteer_fields'] = $request->volunteer_fields;
 
+
         //  Handle the image properly
         if ($request->hasFile('image')) {
             $image = $this->imageRepo->createPlaceholder();
             $this->imageRepo->storeTempImageAndDispatch($request['image'], $image->id);
 
+            $register_Data['image_id'] = $image->id; // Save only the image ID
+        }else{
+            $image = $this->imageRepo->createPlaceholder();
             $register_Data['image_id'] = $image->id; // Save only the image ID
         }
 
@@ -121,10 +125,10 @@ class AuthService
     {
         $data = $this->authRepository->getUserData($email);
         if (! $data) {
-            throw new Exception('Invalid verification code');
+            throw new Exception('no data for this email');
         }
 
-        $verification_expires_at = now()->addMinutes(3)->toDateTimeString();
+        $verification_expires_at = now()->addMinutes(3);
         $data['verification_expires_at'] = $verification_expires_at;
 
         $data['verification_code'] = rand(100000, 999999);
@@ -170,7 +174,7 @@ class AuthService
             throw new \Exception('Invalid reset code');
         }
         if ($data['reset_code'] != $request['reset_code']) {
-            throw new \Exception('Invalid reset code2');
+            throw new \Exception('Invalid reset code');
         }
         if (now()->isAfter(Carbon::parse($data['reset_expires_at']))) {
             $this->authRepository->deleteResetCode($request->email);
