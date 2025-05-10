@@ -105,6 +105,7 @@ Route::prefix('client/complaint')
     Route::post('/ByStatusAndCategory' , 'complaintsByCatAndSt')->middleware('auth:sanctum');   //get complaints by status and category
     Route::get('/ByID/{id}' , 'complaintsByID')->middleware('auth:sanctum');    //get complaints by id
     Route::get('/category' , 'complaintCategories')->middleware('auth:sanctum');    //get all categories for complaints
+    Route::post('/nearby', 'nearbyComplaints')->middleware('auth:sanctum');
 });
 
 

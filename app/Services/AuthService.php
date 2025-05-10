@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Http\Requests\RegisterRequest;
+use App\Jobs\SendVerificationEmailJob;
+use App\Jobs\SendResetPasswordEmailJob;
 use App\Repositories\AuthRepository;
 use App\Repositories\ClientProfileRepository;
 use App\Repositories\ImageRepository;
@@ -13,6 +15,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 
 class AuthService
 {
@@ -62,11 +65,12 @@ class AuthService
         }
 
         $this->authRepository->initiateRegistration($register_Data);
-        $this->mailService->sendVerificationEmail([
+
+        SendVerificationEmailJob::dispatch([
             'verification_code' => $register_Data['verification_code'],
             'verification_expires_at' => $register_Data['verification_expires_at'],
             'email' => $register_Data['email'],
-        ]);
+        ])->delay(now()->addSeconds(5)); // Delayed by 2 minutes
 
     }
 
@@ -135,11 +139,13 @@ class AuthService
 
         $this->authRepository->initiateRegistration($data);
 
-        $this->mailService->sendVerificationEmail([
-            'verification_code' => $data['verification_code'],
+
+        SendVerificationEmailJob::dispatch([
+          'verification_code' => $data['verification_code'],
             'verification_expires_at' => $data['verification_expires_at'],
             'email' => $email,
-        ]);
+        ])->delay(now()->addSeconds(5)); // Delayed by 2 minutes
+
 
     }
 
@@ -154,6 +160,14 @@ class AuthService
         $data['email'] = $request['email'];
 
         $this->authRepository->cacheResetCode($data);
+
+
+
+        SendResetPasswordEmailJob::dispatch([
+            'reset_code' => $reset_code,
+            'reset_expires_at' => $reset_expires_at,
+            'email' => $request->email,
+        ])->delay(now()->addSeconds(3));
 
         $this->mailService->sendResetPasswordEmail([
             'reset_code' => $reset_code,

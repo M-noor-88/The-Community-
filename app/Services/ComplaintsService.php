@@ -15,6 +15,7 @@ use Illuminate\Http\UploadedFile;
 use  Exception;
 use Illuminate\Support\Facades\Log;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use App\Models\User;
 
 class ComplaintsService
 {
@@ -33,7 +34,7 @@ class ComplaintsService
             'status' => $complaint->status,
             'created_at' => $complaint->created_at,
             'user' => [
-                'id' => $complaint->user?->id,
+                'userID' => $complaint->user?->id,
                 'created_by' => $complaint->user?->name,
                 'role' => $complaint->user?->getRoleNames()[0] ?? null,
             ],
@@ -81,9 +82,6 @@ class ComplaintsService
         if (!$status) {
             throw new \Exception('Status is required.');
         }
-        if (!ComplaintStatus::isValid($status)) {
-            throw new \InvalidArgumentException("Invalid status: $status");
-        }
         $complaints = $this->complaintsRepo->getComplaintsByStatus($status);
         return $complaints->map(function ($complaint) {
             return $this->getFullComplaint($complaint);
@@ -98,15 +96,35 @@ class ComplaintsService
         if (!$request['status']) {
             throw new \Exception('Status is required.');
         }
-        if (!ComplaintStatus::isValid($request['status'])) {
-            throw new \InvalidArgumentException('Invalid status: ' . $request['status']);
-        }
 
         $complaints = $this->complaintsRepo->getComplaintsByCatAndSt($request);
         return $complaints->map(function ($complaint) {
             return $this->getFullComplaint($complaint);
         });
     }
+
+    public function getNearbyComplaints(array $request)
+    {
+        $user = User::where('id', Auth::id())->with('clientProfile.location')->first();
+
+        if (! $user || ! optional($user->clientProfile->location)->latitude || ! optional($user->clientProfile->location)->longitude) {
+            throw new Exception('User location not set.');
+        }
+
+        $status = $request['status'] ?? null;
+        $categoryId = $request['category_id'] ?? null; // corrected typo 'categoru_id' -> 'category_id'
+        $distance = $request['distance'] ?? 10; // optional: default to 10 km
+
+        $latitude = $user->clientProfile->location->latitude;
+        $longitude = $user->clientProfile->location->longitude;
+
+        $complaints = $this->complaintsRepo->getNearbyComplaints($latitude, $longitude, $distance, $status, $categoryId);
+
+        return $complaints->map(function ($complaint) {
+            return $this->getFullComplaint($complaint);
+        });
+    }
+
     public function createComplaint(array $request)
     {
         DB::beginTransaction();
@@ -259,7 +277,21 @@ class ComplaintsService
         }
 
 
-        $pdf = PDF::loadView('complaints.pdf', compact('complaint'), [], [
+
+        $data = [
+            'name' => $complaint->user->name,
+            'complaint_title' => $complaint->title,
+            'complaint_description' => $complaint->description,
+            'complaint_location' => $complaint->location->name,
+            'phone' => $complaint->user->clientProfile->phone,
+        ];
+
+        if ($complaint->image && $complaint->image->image_url) {
+            $data['image_url'] = $complaint->image->image_url; // Correct syntax here
+        }
+
+
+        $pdf = PDF::loadView('complaints.pdf', compact('data'), [], [
             'mode' => 'utf-8',
             'format' => 'A4',
             'default_font' => 'amiri',

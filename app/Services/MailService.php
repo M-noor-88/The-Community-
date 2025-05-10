@@ -90,7 +90,7 @@ class MailService
         return $this->sendEmail('google_auth', [
             'verification_code' => $request['verification_code'],
             'verification_expires_at' => $request['verification_expires_at'],
-        ], $request['email'], 'Google Authentication Test');
+        ], $request['email'], 'Verification Code');
     }
 
 
@@ -101,5 +101,6 @@ class MailService
             'reset_code' => $request['reset_code'],
             'reset_expires_at' => $request['reset_expires_at'],
         ], $request['email'], 'Reset Password');
+
     }
 }

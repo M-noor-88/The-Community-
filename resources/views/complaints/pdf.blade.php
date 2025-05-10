@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>شكوى رسمية</title>
@@ -7,7 +8,7 @@
     <style>
         @font-face {
             font-family: 'Amiri';
-            src: url('{{ storage_path("fonts/Amiri-Regular.ttf") }}') format('truetype');
+            src: url('{{ storage_path('fonts/Amiri-Regular.ttf') }}') format('truetype');
         }
 
         body {
@@ -39,30 +40,29 @@
         }
     </style>
 </head>
+
 <body>
-
     <h2>كتاب شكوى رسمي</h2>
-
     <p>السادة محافظة دمشق المحترمون،</p>
-
-    <p>نقدم لكم هذه الشكوى من السيد: <strong>{{ $complaint->user->name }}</strong></p>
-    <p>نوع الشكوى: <strong>{{ $complaint->category->name }}</strong></p>
-    <p>عنوان الشكوى: <strong>{{ $complaint->title }}</strong></p>
-    <p>وصف الشكوى: <strong>{{ $complaint->description }}</strong></p>
-    <p> العنوان: <strong>{{ $complaint->location->name }}</strong></p>
+    <p>نقدم لكم هذه الشكوى من السيد: <strong>{{ $data['name'] }}</strong></p>
+    <p>عنوان الشكوى: <strong>{{ $data['complaint_title'] }}</strong></p>
+    <p>وصف الشكوى: <strong>{{ $data['complaint_description'] }}</strong></p>
+    <p> العنوان: <strong>{{ $data['complaint_location'] }}</strong></p>
 
 
+    @if ($data['image_url'] != 'null')
+        <p style="text-align: center;">الصورة المرفقة:</p>
+        <div style="text-align: center">
+            <img src="{{ $data['image_url'] }}" alt="صورة الشكوى"
+                style="width: 370px; height: 200px; display: block; margin: 0 auto;">
+        </div>
+    @endif
 
-    @if($complaint->image)
-    <p style="text-align: center;">الصورة المرفقة:</p>
-    <div style="text-align: center">
-    <img src="{{ $complaint->image->image_url }}" alt="صورة الشكوى" style="width: 370px; height: 200px; display: block; margin: 0 auto;">
-</div>
-@endif
     <div class="footer">
         <p>يرجى التفضل بالاطلاع والموافقة،</p>
         <p><strong>The-Community</strong></p>
-    </div>
+        <p><strong>رقم مقدم الشكوى :</strong> {{ $data['phone'] }}</p>
 
+    </div>
 </body>
 </html>

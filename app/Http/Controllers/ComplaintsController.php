@@ -54,6 +54,16 @@ class ComplaintsController extends Controller
         }
     }
 
+    public function nearbyComplaints(Request $request): JsonResponse
+    {
+        try {
+            $complaints = $this->complaintsService->getNearbyComplaints($request->all());
+            return $this->success($complaints, 'Complaints retrieved successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
     public function complaintsByCatAndSt(Request $request): JsonResponse
     {
         try {
