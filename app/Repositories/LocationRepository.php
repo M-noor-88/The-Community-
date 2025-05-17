@@ -2,8 +2,8 @@
 
 namespace App\Repositories;
 
-use Illuminate\Support\Facades\DB;
 use App\Models\Location;
+use Illuminate\Support\Facades\DB;
 
 class LocationRepository
 {
@@ -18,6 +18,7 @@ class LocationRepository
         ]);
     }
 
+
     public function getAllLocations()
 {
     return Location::select('id', 'name')
@@ -30,4 +31,16 @@ class LocationRepository
         });
 }
 
+    public function update(array $data, int $locationId): int
+    {
+        $location = Location::findOrFail($locationId);
+
+        $location->update([
+            'latitude' => $data['latitude'],
+            'longitude' => $data['longitude'],
+            'name' => $data['area'] ?? $location->name, // keep current name if not provided
+        ]);
+
+        return $location->id;
+    }
 }

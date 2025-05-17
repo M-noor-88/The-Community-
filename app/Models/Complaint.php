@@ -45,6 +45,7 @@ class Complaint extends Model
         return $this->belongsToMany(Image::class, 'complaint_images')->where('type', 'complaint');
     }
 
+
     public function achievementImages()
     {
         return $this->belongsToMany(Image::class, 'complaint_images')->where('type', 'achievement');

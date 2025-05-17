@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\VotesController;
 use App\Http\Controllers\CampaignParticipantController;
@@ -9,6 +10,8 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ComplaintsController;
 
 use App\Http\Controllers\RatesController;
+use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\Volunteer\VolunteerProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -117,6 +120,13 @@ Route::prefix('volunteer')
         Route::post('logout', 'logout')->middleware('auth:sanctum');
     });
 
+//Profile Volunteer
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/volunteer/profile/{userID}', [VolunteerProfileController::class, 'update']);
+    Route::delete('/volunteer/profile', [VolunteerProfileController::class, 'destroy']);
+    Route::get('/volunteer/show/profile' ,[VolunteerProfileController::class, 'showProfile']);
+});
+
 
 Route::middleware(['auth:sanctum'])->prefix('project')->controller(CampaignParticipantController::class)
     ->group(function () {
@@ -168,3 +178,29 @@ Route::middleware('auth:sanctum')
     Route::post('/{projectId}/promote',  'promote');
 });
 
+
+Route::prefix('categories')->group(function () {
+    Route::post('/', [CategoryController::class, 'store'])->middleware('auth:sanctum');
+    Route::get('/', [CategoryController::class, 'index']);
+    Route::delete('/{id}', [CategoryController::class, 'destroy']);
+});
+
+Route::prefix('statistics')->controller(StatisticsController::class)->group(function () {
+    Route::get('basic-counts',  'basicCounts');
+    Route::get('top-rated-projects', 'topRatedProjects');
+    Route::get('most-participated-projects', 'mostParticipatedProjects');
+    Route::get('projects-by-category',  'projectsByCategory');
+    Route::get('votes-summary', 'votesSummary');
+
+    Route::get('user-role-distribution', 'userRoleDistribution');
+    Route::get('weekly-participation',  'weeklyParticipation');
+
+    Route::get('/official-campaigns', [StatisticsController::class, 'getOfficialCampaigns']);
+    Route::get('/initiatives', [StatisticsController::class, 'getInitiatives']);
+    Route::get('/complaints', [StatisticsController::class, 'getComplaintStats']);
+
+    Route::get('/monthly', [StatisticsController::class, 'getMonthlyStatistics']);
+
+    Route::get('/status', [StatisticsController::class, 'getNumberProjectsStatus']);
+
+});
