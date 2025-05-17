@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 /**
  * @method static where(string $string, int $img_id)
@@ -12,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Image extends Model
 {
+    use HasFactory;
     protected $table = 'images';
 
     protected $fillable = ['image_url'];

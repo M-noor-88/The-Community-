@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('image_id')->nullable()->constrained('images')->onDelete('set null');
             $table->foreignId('complaint_category_id')->constrained('complaint_categories')->onDelete('cascade');
             $table->foreignId('location_id')->nullable()->constrained('locations')->onDelete('set null');
             $table->string('title');

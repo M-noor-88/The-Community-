@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('achievement_images', function (Blueprint $table) {
+        Schema::create('complaint_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('complaint_id')->constrained()->onDelete('cascade');
             $table->foreignId('image_id')->constrained('images')->onDelete('cascade');
+            $table->enum('type', ['complaint', 'achievement']);
             $table->timestamps();
         });
 

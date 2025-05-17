@@ -2,37 +2,22 @@
 
 namespace App\Repositories;
 
-use App\Models\Complaint;
-use Google\Service\Docs\Request;
-use \Illuminate\Database\Eloquent\Collection;
 use App\Models\ComplaintCategory;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use App\Models\Complaint;
+use App\Models\Location;
+use App\Models\User;
+use App\Enums\ComplaintStatus;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use \Illuminate\Support\Collection;
 
 class ComplaintsRepository
 {
-
-    protected const CACHE_ALL = 'complaints:all';
-    protected const CACHE_STATUS = 'complaints:status:'; // append status
-    protected const CACHE_CATEGORY = 'complaints:category:'; // append category_id
-    protected const CACHE_CAT_STATUS = 'complaints:cat:status:'; // append category_id:status
-
-
-    public function getAllComplaints(): Collection
-    {
-        return Cache::remember(self::CACHE_ALL, 3600, function () {
-            return Complaint::all();
-        });
-    }
-
     public function create(array $data): Complaint
     {
-
-        $this->clearComplaintCache();
         return  Complaint::create([
             'user_id' => $data['user_id'],
             'location_id' => $data['location_id'],
-            'image_id' => ($data['image_id']),
             'complaint_category_id' => $data['complaint_category_id'],
             'title' => $data['title'],
             'description' => $data['description'],
@@ -40,67 +25,57 @@ class ComplaintsRepository
         ]);
     }
 
-    public function getComplaintsByStatus($status): Collection
+    public function applyCommonFilters(array $filters): Builder
     {
-        $status_number=$this->setStatusNumber($status);
-        $key = self::CACHE_STATUS .$status_number ;
-        return Cache::remember($key, 3600, function () use ($status) {
-            return Complaint::where('status', $status)->get();
-        });
-    }
+        $query = Complaint::query();
 
-    public function setStatusNumber($status)
-    {
-        switch ($status) {
-            case 'انتظار':
-                return 1;
-            case 'تم التحقق':
-                return 2;
-            case 'مرفوضة':
-                return 3;
-            case 'يتم التنفيذ';
-                return 4;
-            case 'منجزة':
-                return 5;
-            case 'null':
-                return 6;
-            default:
-                throw new \InvalidArgumentException('Invalid status: ' . $status);
-        }
-    }
-
-    public function getComplaintsByCategory($category_id): Collection
-    {
-        $category = ComplaintCategory::find($category_id);
-        if (!$category) {
-            throw new \Exception('Category not found.');
+        if (!empty($filters['status'])) {
+            if (!ComplaintStatus::isValid($filters['status'])) {
+                throw new \InvalidArgumentException("Invalid status: {$filters['status']}");
+            }
+            $query->where('status', $filters['status']);
         }
 
-        $key = self::CACHE_CATEGORY . $category_id;
-
-        return Cache::remember($key, 3600, function () use ($category_id) {
-            return Complaint::where('complaint_category_id', $category_id)->get();
-        });
-    }
-
-    public function getComplaintsByCatAndSt(array $request): Collection
-    {
-        $category_id = $request['category_id'];
-        $status = $request['status'];
-        $status_number=$this->setStatusNumber($status);
-
-        $category = ComplaintCategory::find($category_id);
-        if (!$category) {
-            throw new \Exception('Category not found.');
+        if (!empty($filters['category_id'])) {
+            if (!ComplaintCategory::where('id', $filters['category_id'])->exists()) {
+                throw new \InvalidArgumentException("Invalid category ID: {$filters['category_id']}");
+            }
+            $query->where('complaint_category_id', $filters['category_id']);
         }
 
-        $key = self::CACHE_CAT_STATUS . "$category_id:$status_number";
+        if (!empty($filters['location_id'])) {
+            if (!Location::where('id', $filters['location_id'])->exists()) {
+                throw new \InvalidArgumentException("Invalid location ID: {$filters['location_id']}");
+            }
+            $query->where('location_id', $filters['location_id']);
+        }
+        return $query;
+    }
 
-        return Cache::remember($key, 3600, function () use ($category_id, $status) {
-            return Complaint::where('complaint_category_id', $category_id)
-                ->where('status', $status)
-                ->get();
-        });
+    public function applyNearbyFilter($query, int $distance = 100): Builder
+    {
+        $user = Auth::user();
+        if ($user) {
+            $user = User::with('clientProfile.location')->find($user->id);
+        }
+
+        if (! $user || !$user->clientProfile || !$user->clientProfile->location) {
+            throw new \Exception('User location not set.');
+        }
+
+        $latitude = $user->clientProfile->location->latitude;
+        $longitude = $user->clientProfile->location->longitude;
+
+        return $query->join('locations', 'complaints.location_id', '=', 'locations.id')
+        ->select('complaints.*') // ✅ force correct columns
+            ->whereRaw(
+                '(6371 * acos(
+                    cos(radians(?)) * cos(radians(locations.latitude)) *
+                    cos(radians(locations.longitude) - radians(?)) +
+                    sin(radians(?)) * sin(radians(locations.latitude))
+                )) <= ?',
+                [$latitude, $longitude, $latitude, $distance]
+            );
     }
 
     public function getComplaintById($id): Complaint
@@ -109,6 +84,7 @@ class ComplaintsRepository
             throw new \Exception('Complaint ID is required.');
         }
         $complaint = Complaint::find($id);
+
         if (!$complaint) {
             throw new \Exception('Complaint not found.');
         }
@@ -117,7 +93,14 @@ class ComplaintsRepository
 
     public function getComplaintCategories(): Collection
     {
-        return ComplaintCategory::select('id', 'name')->get();
+        return ComplaintCategory::select('id', 'name')
+        ->get()
+        ->map(function ($category) {
+            return [
+                'category_id' => $category->id,
+                'name' => $category->name,
+            ];
+        });
     }
 
     public function createComplaintCategory($name): ComplaintCategory
@@ -129,10 +112,7 @@ class ComplaintsRepository
 
     public function updateComplaintCategory($id, $name): ComplaintCategory
     {
-        $category = ComplaintCategory::find($id);
-        if (!$category) {
-            throw new \Exception('Category not found.');
-        }
+        $category = ComplaintCategory::findOrFail($id);
         $category->name = $name;
         $category->save();
         return $category;
@@ -140,53 +120,8 @@ class ComplaintsRepository
 
     public function deleteComplaintCategory($id): bool
     {
-        $category = ComplaintCategory::find($id);
-        if (!$category) {
-            throw new \Exception('Category not found.');
-        }
+        $category = ComplaintCategory::findOrFail($id);
+
         return $category->delete();
     }
-
-
-    public function clearComplaintCache(): void
-    {
-        Cache::forget(self::CACHE_ALL);
-
-        if (Cache::getStore() instanceof \Illuminate\Cache\RedisStore) {
-            $redis = Cache::getRedis();
-            $keys = $redis->keys('complaints:*');
-            foreach ($keys as $key) {
-                $redis->del($key);
-            }
-        }
-    }
-
-    public function getNearbyComplaints($latitude, $longitude, $distanceKm = 1000, $status = null, $categoryId = null):Collection
-    {
-
-        $status = $request['status'] ?? null;
-        $categoryId = $request['category_id'] ?? null;
-
-        $distanceFormula = "(6371 * acos(cos(radians($latitude)) * cos(radians(locations.latitude)) * cos(radians(locations.longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(locations.latitude))))";
-
-        $query = Complaint::query()
-            ->join('locations', 'complaints.location_id', '=', 'locations.id')
-            ->select('complaints.*')
-            ->whereRaw("$distanceFormula < ?", [$distanceKm]);
-
-
-
-        if ($status) {
-            $query->where('complaints.status', $status);
-        }
-
-        if ($categoryId) {
-            $query->where('complaints.category_id', $categoryId);
-        }
-
-        return $query->get();
-    }
-
-
-
 }

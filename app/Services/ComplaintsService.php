@@ -2,20 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\Complaint;
-use App\Models\ComplaintCategory;
+
+use App\Repositories\ComplaintsRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\ImageRepository;
-use App\Repositories\ComplaintsRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Collection;
-use App\Enums\ComplaintStatus;
-use Illuminate\Http\UploadedFile;
-use  Exception;
 use Illuminate\Support\Facades\Log;
-use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
-use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use App\Enums\ComplaintStatus;
+use App\Models\ComplaintCategory;
+use App\Http\Resources\ComplaintResource;
+use  Exception;
+
 
 class ComplaintsService
 {
@@ -25,120 +24,54 @@ class ComplaintsService
         private ComplaintsRepository $complaintsRepo,
     ) {}
 
-    public function getFullComplaint(Complaint $complaint)
+    public function getResponseDetails($complaints): array
     {
         $data = [
-            'id' => $complaint->id,
-            'title' => $complaint->title,
-            'description' => $complaint->description,
-            'status' => $complaint->status,
-            'created_at' => $complaint->created_at,
-            'user' => [
-                'userID' => $complaint->user?->id,
-                'created_by' => $complaint->user?->name,
-                'role' => $complaint->user?->getRoleNames()[0] ?? null,
-            ],
-            'image_url' => $complaint->image?->image_url,
-            'category' => $complaint->category?->name,
-            'location' => [
-                'name' => $complaint->location?->name,
-                'latitude' => $complaint->location?->latitude,
-                'longitude' => $complaint->location?->longitude,
-            ],
-            'achievement_images' => $complaint->achievementImages->map(function ($image) {
-                return [
-                    'id' => $image->id,
-                    'url' => $image->image_url,
-                ];
-            }),
+            'total' => $complaints->count(),
+            'complaints' => $complaints,
+            'complaint_categories' => $this->getComplaintCategories(),
+            'complaint_locations' => $this->locationRepo->getAllLocations(),
         ];
-
         return $data;
     }
 
-
-    public function getAllComplaints()
+    public function filterComplaintsClient(array $filters): array
     {
-        $complaints = $this->complaintsRepo->getAllComplaints();
+        $complaints = $this->complaintsRepo->applyCommonFilters($filters);
 
-        return $complaints->map(function ($complaint) {
-            return $this->getFullComplaint($complaint);
+        if (isset($filters['nearby']) && $filters['nearby']) {
+            $complaints = $this->complaintsRepo->applyNearbyFilter($complaints);
+        }
+        $complaints = $complaints->get();
+
+        $FullConlaints = $complaints->map(function ($complaint) {
+            return new ComplaintResource($complaint);
         });
+        return $this->getResponseDetails($FullConlaints);
     }
 
-    public function getComplaintsByCategory($category_id)
+    public function filterComplaintsAdmin(array $filters): array
     {
-        if (!$category_id) {
-            throw new \Exception('Category ID is required.');
-        }
-        $complaints = $this->complaintsRepo->getComplaintsByCategory($category_id);
-        return $complaints->map(function ($complaint) {
-            return $this->getFullComplaint($complaint);
+        $complaints = $this->complaintsRepo->applyCommonFilters($filters);
+        $complaints = $complaints->get();
+        $FullConlaints = $complaints->map(function ($complaint) {
+            return new ComplaintResource($complaint);
         });
+        return $this->getResponseDetails($FullConlaints);
     }
 
-    public function getComplaintsByStatus($status)
+    public function createComplaint(array $request): array
     {
-        if (!$status) {
-            throw new \Exception('Status is required.');
-        }
-        $complaints = $this->complaintsRepo->getComplaintsByStatus($status);
-        return $complaints->map(function ($complaint) {
-            return $this->getFullComplaint($complaint);
-        });
-    }
-
-    public function getComplaintsByCatAndSt(array $request)
-    {
-        if (!$request['category_id']) {
-            throw new \Exception('Category ID is required.');
-        }
-        if (!$request['status']) {
-            throw new \Exception('Status is required.');
-        }
-
-        $complaints = $this->complaintsRepo->getComplaintsByCatAndSt($request);
-        return $complaints->map(function ($complaint) {
-            return $this->getFullComplaint($complaint);
-        });
-    }
-
-    public function getNearbyComplaints(array $request)
-    {
-        $user = User::where('id', Auth::id())->with('clientProfile.location')->first();
-
-        if (! $user || ! optional($user->clientProfile->location)->latitude || ! optional($user->clientProfile->location)->longitude) {
-            throw new Exception('User location not set.');
-        }
-
-        $status = $request['status'] ?? null;
-        $categoryId = $request['category_id'] ?? null; // corrected typo 'categoru_id' -> 'category_id'
-        $distance = $request['distance'] ?? 10; // optional: default to 10 km
-
-        $latitude = $user->clientProfile->location->latitude;
-        $longitude = $user->clientProfile->location->longitude;
-
-        $complaints = $this->complaintsRepo->getNearbyComplaints($latitude, $longitude, $distance, $status, $categoryId);
-
-        return $complaints->map(function ($complaint) {
-            return $this->getFullComplaint($complaint);
-        });
-    }
-
-    public function createComplaint(array $request)
-    {
+        $complaintImages = $request['complaintImages'] ?? [];
+        $attachedImageIds = [];
         DB::beginTransaction();
 
         try {
-            $location = $this->locationRepo->create([
+            $location_id = $this->locationRepo->create([
                 'latitude' => $request['latitude'],
                 'longitude' => $request['longitude'],
                 'area' => $request['area'] ?? 'غير معروف',
             ]);
-
-            $image = DB::transaction(function () {
-                return $this->imageRepo->createPlaceholder();
-            });
 
             $user = Auth::user();
             if (!$user) {
@@ -148,23 +81,24 @@ class ComplaintsService
             $complaint = $this->complaintsRepo->create([
                 'user_id' => $user->id,
                 'complaint_category_id' => $request['complaint_category_id'],
-                'location_id' => $location,
-                'image_id' => $image->id,
+                'location_id' => $location_id,
                 'title' => $request['title'],
                 'description' => $request['description'] ?? null,
                 'status' => 'انتظار',
             ]);
 
-            DB::commit();
-
-            if (isset($request['image'])) {
-                $this->imageRepo->storeTempImageAndDispatch($request['image'], $image->id);
+            if (!empty($complaintImages)) {
+                $images = is_array($complaintImages) ? $complaintImages : [$complaintImages];
+                $attachedImageIds = $this->storeImages($complaintImages);
+                Log::info('Attached Image IDs: ' . implode(', ', $attachedImageIds)); // Add this log inf
+                if (!empty($attachedImageIds)) {
+                    $complaint->complaintImages()->attach($attachedImageIds, ['type' => 'complaint']);
+                }
             }
-
-            return $this->getFullComplaint($complaint);
+            DB::commit();
+            return ['complaint' => new ComplaintResource($complaint)];
         } catch (Exception $e) {
             DB::rollBack();
-
             if (isset($image)) {
                 $this->imageRepo->deleteImagePlaceholder($image->id);
             }
@@ -172,7 +106,7 @@ class ComplaintsService
         }
     }
 
-    public function updateComplaintStatus($id, array $request)
+    public function updateComplaintStatus($id, array $request): array
     {
         $status = $request['status'] ?? null;
         $achievementImages = $request['achievementImages'] ?? [];
@@ -193,30 +127,17 @@ class ComplaintsService
 
                 if (!empty($achievementImages)) {
                     $images = is_array($achievementImages) ? $achievementImages : [$achievementImages];
-
-                    foreach ($images as $imageFile) {
-                        if ($imageFile instanceof UploadedFile) {
-                            $image = $this->imageRepo->createPlaceholder(); // Save temp row in images table
-                            $this->imageRepo->storeTempImageAndDispatch($imageFile, $image->id);
-
-                            $attachedImageIds[] = $image->id;
-                        }
-                    }
-
+                    $attachedImageIds = $this->storeImages($achievementImages);
                     if (!empty($attachedImageIds)) {
-                        log::info('asdasd');
-                        $complaint->achievementImages()->attach($attachedImageIds);
+                        $complaint->achievementImages()->attach($attachedImageIds, ['type' => 'achievement']);
                     }
                 }
             }
-
             $complaint->update([
                 'status' => $status,
             ]);
-
-            $this->complaintsRepo->clearComplaintCache();
             DB::commit();
-            return $this->getFullComplaint($complaint);
+            return ['complaint' => new ComplaintResource($complaint)];
         } catch (\Exception $e) {
             // Clean up image placeholder if it was created
             foreach ($attachedImageIds as $imageId) {
@@ -227,17 +148,33 @@ class ComplaintsService
         }
     }
 
-    public function getComplaintsByID($id)
+    private function storeImages(array $images): array
+    {
+        $attachedImageIds = [];
+
+        foreach ($images as $imageFile) {
+            if ($imageFile instanceof UploadedFile) {
+                $image = $this->imageRepo->createPlaceholder();
+                $this->imageRepo->storeTempImageAndDispatch($imageFile, $image->id);
+                $attachedImageIds[] = $image->id;
+            }
+        }
+
+        return $attachedImageIds;
+    }
+
+
+    public function getComplaintsByID($id): array
     {
         // Get complaint
         $complaint = $this->complaintsRepo->getComplaintById($id);
         if (!$complaint) {
             throw new \Exception('Complaint not found.');
         }
-        return $this->getFullComplaint($complaint);
+        return ['complaint' => new ComplaintResource($complaint)];
     }
 
-    public function getComplaintCategories(): collection
+    public function getComplaintCategories(): \Illuminate\Support\Collection
     {
 
         return $this->complaintsRepo->getComplaintCategories();
@@ -257,58 +194,5 @@ class ComplaintsService
     public function deleteComplaintCategory($id): void
     {
         $this->complaintsRepo->deleteComplaintCategory($id);
-    }
-
-    public function getFormalBook($id)
-    {
-        $complaint = $this->complaintsRepo->getComplaintById($id);
-        if (!$complaint) {
-            throw new \Exception('Complaint not found.');
-        }
-        $html = view('complaints.pdf', ['complaint' => $complaint])->render();
-        return $html; // Return the rendered view as a string or nul
-    }
-
-    public function downloadFormalBook($id)
-    {
-        $complaint = $this->complaintsRepo->getComplaintById($id);
-        if (!$complaint) {
-            throw new \Exception('Complaint not found.');
-        }
-
-
-
-        $data = [
-            'name' => $complaint->user->name,
-            'complaint_title' => $complaint->title,
-            'complaint_description' => $complaint->description,
-            'complaint_location' => $complaint->location->name,
-            'phone' => $complaint->user->clientProfile->phone,
-        ];
-
-        if ($complaint->image && $complaint->image->image_url) {
-            $data['image_url'] = $complaint->image->image_url; // Correct syntax here
-        }
-
-
-        $pdf = PDF::loadView('complaints.pdf', compact('data'), [], [
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'default_font' => 'amiri',
-            'orientation' => 'P',
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_top' => 10,
-            'margin_bottom' => 10,
-            'mirrorMargins' => true,
-            'default_font_size' => 12,
-            'directionality' => 'rtl',
-            'autoScriptToLang' => true,
-            'autoLangToFont' => true
-        ]);
-
-
-
-        return $pdf;
     }
 }

@@ -2,75 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Exception;
 use App\Traits\JsonResponseTrait;
 use Illuminate\Http\JsonResponse;
 use App\Services\ComplaintsService;
+use App\Services\PdfGeneratorService;
 use App\Http\Requests\ComplaintRequest;
+use App\Http\Requests\FilterComplaintRequest;
 use App\Http\Requests\UpdateComplaintRequest;
-use Illuminate\Support\Facades\Log;
-
-use Exception;
+use App\Http\Requests\ComplaintCategoryRequest;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ComplaintsController extends Controller
 {
     use JsonResponseTrait;
     protected ComplaintsService $complaintsService;
-    public function __construct(ComplaintsService $complaintsService)
+    protected PdfGeneratorService $pdfGeneratorService;
+    public function __construct(ComplaintsService $complaintsService, PdfGeneratorService $pdfGeneratorService)
     {
+        $this->pdfGeneratorService = $pdfGeneratorService;
         $this->complaintsService = $complaintsService;
     }
 
-    public function index(): JsonResponse
-    {
-        try {
-            $complaints = $this->complaintsService->getAllComplaints();
-            return $this->success($complaints, 'Complaints retrieved successfully');
-        } catch (Exception $e) {
-            return $this->error($e->getMessage());
-        }
-    }
 
-    public function complaintsByCategory($category_id): JsonResponse
+    public function filterComplaintsClient(FilterComplaintRequest $request): JsonResponse
     {
         try {
-            $complaints = $this->complaintsService->getComplaintsByCategory($category_id);
-            return $this->success($complaints, 'Complaints retrieved successfully');
-        } catch (Exception $e) {
-            return $this->error($e->getMessage());
-        }
-    }
-
-    public function complaintsByStatus($status = null): JsonResponse
-    {
-        try {
-            if (is_null($status) || $status === 'null') {
-                $status = 'انتظار';
+            $filters = $request->only(['status', 'category_id', 'nearby', 'location_id']);
+            $complaints = $this->complaintsService->filterComplaintsClient($filters);
+            if ($complaints['complaints']->isEmpty()) {
+                return $this->success('No complaints found', 204);
             }
-            $complaints = $this->complaintsService->getComplaintsByStatus($status);
             return $this->success($complaints, 'Complaints retrieved successfully');
-        } catch (Exception $e) {
-            return $this->error($e->getMessage());
+        } catch (\Throwable $e) {
+            return $this->error($e->getMessage(), 500);
         }
     }
 
-    public function nearbyComplaints(Request $request): JsonResponse
+    public function filterComplaintsAdmin(FilterComplaintRequest $request): JsonResponse
     {
         try {
-            $complaints = $this->complaintsService->getNearbyComplaints($request->all());
+            $filters = $request->only(['status', 'category_id', 'location_id']);
+            $complaints = $this->complaintsService->filterComplaintsAdmin($filters);
+            if ($complaints['complaints']->isEmpty()) {
+                return $this->success('No complaints found', 204);
+            }
             return $this->success($complaints, 'Complaints retrieved successfully');
-        } catch (Exception $e) {
-            return $this->error($e->getMessage());
-        }
-    }
-
-    public function complaintsByCatAndSt(Request $request): JsonResponse
-    {
-        try {
-            $complaints = $this->complaintsService->getComplaintsByCatAndSt($request->all());
-            return $this->success($complaints, 'Complaints retrieved successfully');
-        } catch (Exception $e) {
-            return $this->error($e->getMessage());
+        } catch (\Throwable $e) {
+            return $this->error($e->getMessage(), 500);
         }
     }
 
@@ -78,7 +57,17 @@ class ComplaintsController extends Controller
     {
         try {
             $complaint = $this->complaintsService->createComplaint($request->all());
-            return $this->success($complaint, 'Complaint created successfully');
+            return $this->success($complaint, 'Complaint created successfully', 201);
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function getAllCategories(): JsonResponse
+    {
+        try {
+            $categories = $this->complaintsService->getComplaintCategories();
+            return $this->success($categories, 'Categories retrieved successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
@@ -87,7 +76,6 @@ class ComplaintsController extends Controller
     public function updateStatus(UpdateComplaintRequest $request, $id): JsonResponse
     {
         try {
-            Log::info($request);
             $complaint = $this->complaintsService->updateComplaintStatus($id, $request->all());
             return $this->success($complaint, 'Complaint status updated successfully');
         } catch (Exception $e) {
@@ -105,27 +93,17 @@ class ComplaintsController extends Controller
         }
     }
 
-    public function complaintCategories(): JsonResponse
-    {
-        try {
-            $complaints = $this->complaintsService->getComplaintCategories();
-            return $this->success($complaints, 'Complaints retrieved successfully');
-        } catch (Exception $e) {
-            return $this->error($e->getMessage());
-        }
-    }
-
-    public function createCategory(Request $request): JsonResponse
+    public function createCategory(ComplaintCategoryRequest $request): JsonResponse
     {
         try {
             $complaints = $this->complaintsService->createComplaintCategory($request['name']);
-            return $this->success($complaints, 'category created  successfully');
+            return $this->success($complaints, 'category created  successfully', 201);
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
-    public function updateCategory(Request $request, $id): JsonResponse
+    public function updateCategory(ComplaintCategoryRequest $request, $id): JsonResponse
     {
         try {
             $complaints = $this->complaintsService->updateComplaintCategory($id, $request['name']);
@@ -145,15 +123,15 @@ class ComplaintsController extends Controller
         }
     }
 
-    public function  getFormalBook($id)
+    public function  getFormalBook($id): StreamedResponse
     {
-        $pdf = $this->complaintsService->downloadFormalBook($id);
+        $pdf = $this->pdfGeneratorService->downloadFormalBook($id);
         return $pdf->stream('complaint_' . $id . '.pdf');
     }
 
-    public function downloadFormalBook($id)
+    public function downloadFormalBook($id): StreamedResponse
     {
-        $pdf = $this->complaintsService->downloadFormalBook($id);
+        $pdf = $this->pdfGeneratorService->downloadFormalBook($id);
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
         }, 'complaint_' . $id . '.pdf', [

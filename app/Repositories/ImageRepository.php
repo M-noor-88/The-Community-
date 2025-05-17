@@ -12,6 +12,7 @@ class ImageRepository
     {
         return Image::create([
             'image_url' => 'null',
+            
         ]);
     }
 

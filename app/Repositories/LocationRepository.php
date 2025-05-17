@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use App\Models\Location;
 
 class LocationRepository
 {
@@ -16,4 +17,17 @@ class LocationRepository
             'updated_at' => now(),
         ]);
     }
+
+    public function getAllLocations()
+{
+    return Location::select('id', 'name')
+        ->get()
+        ->map(function ($location) {
+            return [
+                'location_id' => $location->id,
+                'name' => $location->name,
+            ];
+        });
+}
+
 }

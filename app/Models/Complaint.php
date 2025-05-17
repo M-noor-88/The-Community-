@@ -11,7 +11,7 @@ class Complaint extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'image_id', 'complaint_category_id', 'location_id',
+        'user_id', 'complaint_category_id', 'location_id',
         'title', 'description', 'status',
     ];
 
@@ -40,9 +40,15 @@ class Complaint extends Model
         return $this->hasMany(CampaignParticipant::class);
     }
 
+    public function complaintImages()
+    {
+        return $this->belongsToMany(Image::class, 'complaint_images')->where('type', 'complaint');
+    }
+
     public function achievementImages()
     {
-        return $this->belongsToMany(Image::class, 'achievement_images');
+        return $this->belongsToMany(Image::class, 'complaint_images')->where('type', 'achievement');
     }
+
 
 }

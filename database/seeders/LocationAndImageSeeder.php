@@ -20,6 +20,12 @@ class LocationAndImageSeeder extends Seeder
             'latitude'=> 54.324093242893,
         ]);
 
+        Location::create([
+            'name' => "somewhere else",
+            'longitude' => 44.222221434235,
+            'latitude'=> 55.324093242893,
+        ]);
+
         Image::create([
             'image_url' => "http://just-fake-url"
         ]);

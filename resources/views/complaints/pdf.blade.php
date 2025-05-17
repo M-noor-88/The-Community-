@@ -49,14 +49,26 @@
     <p>وصف الشكوى: <strong>{{ $data['complaint_description'] }}</strong></p>
     <p> العنوان: <strong>{{ $data['complaint_location'] }}</strong></p>
 
+    @if (!empty($data['achievementImages']) && $data['achievementImages']->isNotEmpty())
+    <h3 style="margin-top: 40px;">صور الإنجاز:</h3>
+    <table width="100%" cellpadding="10" cellspacing="0">
+        @foreach ($data['achievementImages']->chunk(2) as $chunk)
+            <tr>
+                @foreach ($chunk as $index => $image)
+                    <td align="center" valign="top" style="border: 1px solid #ccc;">
+                        <img src="{{ $image->image_url }}" alt="Achievement Image" style="width:350px height: auto; max-height: 200px; margin-bottom: 5px;">
+                        <div style="font-size: 14px; margin-top: 5px;">صورة رقم {{ $loop->parent->iteration * 2 - 1 + $loop->iteration -1 }}</div>
+                    </td>
+                @endforeach
+                @if ($chunk->count() < 2)
+                    <td></td> {{-- Empty cell for alignment if odd number --}}
+                @endif
+            </tr>
+        @endforeach
+    </table>
+@endif
 
-    @if ($data['image_url'] != 'null')
-        <p style="text-align: center;">الصورة المرفقة:</p>
-        <div style="text-align: center">
-            <img src="{{ $data['image_url'] }}" alt="صورة الشكوى"
-                style="width: 370px; height: 200px; display: block; margin: 0 auto;">
-        </div>
-    @endif
+
 
     <div class="footer">
         <p>يرجى التفضل بالاطلاع والموافقة،</p>
@@ -65,4 +77,5 @@
 
     </div>
 </body>
+
 </html>

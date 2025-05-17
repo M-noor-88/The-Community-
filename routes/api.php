@@ -95,17 +95,14 @@ Route::middleware('auth:sanctum')->post('/ratings', [RatesController::class,'add
     // Project Creation and Handling
 Route::prefix('client/complaint')
 ->middleware(['role:client'])
+->middleware('auth:sanctum')
 ->controller(ComplaintsController::class)
 ->group(function () {
-    Route::post('/create', 'store')->middleware('auth:sanctum');
+    Route::post('/create', 'store');
+    Route::post('/all' , 'filterComplaintsClient');
+    Route::get('/ByID/{id}' , 'complaintsByID');    //get complaints by id
+    Route::get('/category/all', 'getAllCategories');
 
-    Route::get('/all' , 'index')->middleware('auth:sanctum');   ///get all complaints
-    Route::get('/ByCategory/{category_id}' , 'complaintsByCategory')->middleware('auth:sanctum');   //get complaints by category
-    Route::get('/ByStatus/{status?}' , 'complaintsByStatus')->middleware('auth:sanctum');   //get complaints by status
-    Route::post('/ByStatusAndCategory' , 'complaintsByCatAndSt')->middleware('auth:sanctum');   //get complaints by status and category
-    Route::get('/ByID/{id}' , 'complaintsByID')->middleware('auth:sanctum');    //get complaints by id
-    Route::get('/category' , 'complaintCategories')->middleware('auth:sanctum');    //get all categories for complaints
-    Route::post('/nearby', 'nearbyComplaints')->middleware('auth:sanctum');
 });
 
 
@@ -137,19 +134,17 @@ Route::prefix('admin/complaint')
 ->controller(ComplaintsController::class)
 ->group(function () {
 
-    Route::get('/all' , 'index');
-    Route::get('/ByCategory/{category_id}' , 'complaintsByCategory');
-    Route::get('/ByStatus/{status?}' , 'complaintsByStatus');
-    Route::post('/ByStatusAndCategory' , 'complaintsByCatAndSt');
+    Route::post('/all' , 'filterComplaintsAdmin');
+
     Route::get('/ByID/{id}' , 'complaintsByID');
-    Route::get('/category' , 'complaintCategories');
 
     Route::post('/{id}/updateStatus', 'updateStatus');
     Route::get('/formalbook/{id}', 'getFormalBook');
     Route::get('/download/formalbook/{id}', 'downloadFormalBook');
 
     /////category
-    Route::post('/category/create', 'createCategory');
+    Route::get('/category/all', 'getAllCategories');
+    Route::post('/category/create', 'createCategory')->name('createCategory');
     Route::post('/category/update/{id}', 'updateCategory');
     Route::delete('/category/delete/{id}', 'deleteCategory');
 });
