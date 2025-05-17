@@ -76,6 +76,7 @@ class ProjectService
                 'image_id' => $image->id,
                 'title' => $requestData['title'],
                 'description' => $requestData['description'] ?? null,
+                'Execution_date' => $requestData['execution_date'] ?? null,
                 'type' => $type,
                 'status' => $status,
                 'number_of_participant' => $requestData['number_of_participant'],
@@ -144,9 +145,10 @@ class ProjectService
             'status' => $project->status,
             'execution_date' => $project->Execution_date,
             'user' => [
-                'id' => $project->user?->id,
+                'userID' => $project->user?->id,
                 'created_by' => $project->user?->name,
                 'role' => $project->user?->getRoleNames()[0],
+                'userImage'=> $project->user->clientProfile->image->image_url?? "null",
             ],
             'image_url' => $project->image?->image_url,
             'category' => $project->category?->name,
@@ -162,6 +164,7 @@ class ProjectService
             'number_of_participants' => $project->number_of_participant,
             'joined_participants' => $project->participants?->count() ?? 0,
             'required_amount' => $project->donationSummary?->required_amount ?? 0,
+            'created_at'=> $project->created_at->format('d/m/Y'),
         ];
 
         if ($project->type === 'مبادرة') {

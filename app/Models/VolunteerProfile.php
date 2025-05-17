@@ -23,8 +23,8 @@ class VolunteerProfile extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function image(): HasOne
+    public function image(): BelongsTo
     {
-        return $this->hasOne(Image::class);
+        return $this->belongsTo(Image::class);
     }
 }

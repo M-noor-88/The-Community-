@@ -35,11 +35,6 @@ class Complaint extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function participants()
-    {
-        return $this->hasMany(CampaignParticipant::class);
-    }
-
     public function achievementImages()
     {
         return $this->belongsToMany(Image::class, 'achievement_images');

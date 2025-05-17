@@ -19,7 +19,7 @@ class ProjectRepository
     public function get($projectId): Project
     {
         return Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -34,7 +34,7 @@ class ProjectRepository
     public function getAllProjectsByType($type = null, $status = null): LengthAwarePaginator
     {
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -55,13 +55,13 @@ class ProjectRepository
             $query->where('status', $status);
         }
 
-        return $query->paginate(10);
+        return $query->paginate(5);
     }
 
     public function getProjectsByCategoryAndType($categoryId, $type = null): LengthAwarePaginator
     {
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -84,7 +84,7 @@ class ProjectRepository
         $distanceFormula = "(6371 * acos(cos(radians($latitude)) * cos(radians(locations.latitude)) * cos(radians(locations.longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(locations.latitude))))";
 
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -163,7 +163,7 @@ class ProjectRepository
 
 
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
