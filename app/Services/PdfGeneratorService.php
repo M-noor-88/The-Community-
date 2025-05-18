@@ -1,31 +1,35 @@
 <?php
+
 namespace App\Services;
+
 use App\Repositories\ComplaintsRepository;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
-use Illuminate\Support\Facades\Log;
 
 class PdfGeneratorService
 {
     private $complaintsRepo;
+
     public function __construct(ComplaintsRepository $complaintsRepo)
     {
         $this->complaintsRepo = $complaintsRepo;
     }
+
     public function getFormalBook($id): string
     {
         $complaint = $this->complaintsRepo->getComplaintById($id);
-        if (!$complaint) {
+        if (! $complaint) {
             throw new \Exception('Complaint not found.');
         }
         $complaint->load('achivementImages');
         $html = view('complaints.pdf', ['complaint' => $complaint])->render();
+
         return $html; // Return the rendered view as a string or nul
     }
 
     public function downloadFormalBook($id)
     {
         $complaint = $this->complaintsRepo->getComplaintById($id);
-        if (!$complaint) {
+        if (! $complaint) {
             throw new \Exception('Complaint not found.');
         }
 
@@ -37,9 +41,6 @@ class PdfGeneratorService
             'phone' => $complaint->user->clientProfile->phone,
             'achievementImages' => $complaint->achievementImages,
         ];
-
-
-
 
         $pdf = PDF::loadView('complaints.pdf', compact('data'), [], [
             'mode' => 'utf-8',
@@ -54,7 +55,7 @@ class PdfGeneratorService
             'default_font_size' => 12,
             'directionality' => 'rtl',
             'autoScriptToLang' => true,
-            'autoLangToFont' => true
+            'autoLangToFont' => true,
         ]);
 
         return $pdf;

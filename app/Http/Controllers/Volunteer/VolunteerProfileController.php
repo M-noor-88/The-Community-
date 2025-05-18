@@ -13,9 +13,10 @@ use Illuminate\Validation\ValidationException;
 class VolunteerProfileController extends Controller
 {
     use JsonResponseTrait;
+
     public function __construct(protected VolunteerProfileService $volunteerService) {}
 
-    public function update(Request $request , $userID): JsonResponse
+    public function update(Request $request, $userID): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -25,7 +26,7 @@ class VolunteerProfileController extends Controller
                 'latitude' => 'nullable|numeric',
                 'longitude' => 'nullable|numeric',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-                'area' => 'nullable|string'
+                'area' => 'nullable|string',
             ]);
 
             $profile = $this->volunteerService->updateVolunteer($userID, $validated);
@@ -53,10 +54,10 @@ class VolunteerProfileController extends Controller
     {
         try {
             $data = $this->volunteerService->showProfile();
-            return $this->success($data , 'Success');
-        }catch(Exception $e)
-        {
-            return $this->error('Failed to get Profile' . $e->getMessage());
+
+            return $this->success($data, 'Success');
+        } catch (Exception $e) {
+            return $this->error('Failed to get Profile'.$e->getMessage());
         }
     }
 }

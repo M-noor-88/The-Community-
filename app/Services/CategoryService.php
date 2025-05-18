@@ -4,9 +4,10 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
-use Exception;
+
 class CategoryService
 {
     public function __construct(protected CategoryRepository $categoryRepo) {}
@@ -16,10 +17,10 @@ class CategoryService
      */
     public function create(array $data): Category
     {
-        if(!Auth::user()->hasRole('government_admin'))
-        {
-            throw new Exception("you dont have permission");
+        if (! Auth::user()->hasRole('government_admin')) {
+            throw new Exception('you dont have permission');
         }
+
         return $this->categoryRepo->create($data);
     }
 
@@ -32,5 +33,4 @@ class CategoryService
     {
         $this->categoryRepo->delete($id);
     }
-
 }

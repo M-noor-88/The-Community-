@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 
 trait JsonResponseTrait
 {
-    public function success($data = [], $message = 'Success', $code = 200 ): JsonResponse
+    public function success($data = [], $message = 'Success', $code = 200): JsonResponse
     {
         return response()->json([
             'status' => true,

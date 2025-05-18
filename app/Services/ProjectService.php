@@ -30,10 +30,10 @@ class ProjectService
     {
         $project = $this->projectRepo->get($projectId);
 
-        if(Auth::id())
-        {
-            $this->recommendRepo->updateInterests($project->category->id, Auth::id() , 1);
+        if (Auth::id()) {
+            $this->recommendRepo->updateInterests($project->category->id, Auth::id(), 1);
         }
+
         return $this->transformProject($project);
     }
 
@@ -148,7 +148,7 @@ class ProjectService
                 'userID' => $project->user?->id,
                 'created_by' => $project->user?->name,
                 'role' => $project->user?->getRoleNames()[0],
-                'userImage'=> $project->user->clientProfile->image->image_url?? "null",
+                'userImage' => $project->user->clientProfile->image->image_url ?? 'null',
             ],
             'image_url' => $project->image?->image_url,
             'category' => $project->category?->name,
@@ -164,7 +164,7 @@ class ProjectService
             'number_of_participants' => $project->number_of_participant,
             'joined_participants' => $project->participants?->count() ?? 0,
             'required_amount' => $project->donationSummary?->required_amount ?? 0,
-            'created_at'=> $project->created_at->format('d/m/Y'),
+            'created_at' => $project->created_at->format('d/m/Y'),
         ];
 
         if ($project->type === 'مبادرة') {
@@ -233,12 +233,11 @@ class ProjectService
         return $this->projectRepo->deleteIfInitiativeOwner($projectId, $userId);
     }
 
-
     // Recommendation | Can set Status
-    public function getRecommendation($status , $type)
+    public function getRecommendation($status, $type)
     {
 
-        $projects = $this->projectRepo->getRecommendations(Auth::id() , $status , $type);
+        $projects = $this->projectRepo->getRecommendations(Auth::id(), $status, $type);
 
         return $projects->map(fn ($project) => $this->transformProject($project));
     }

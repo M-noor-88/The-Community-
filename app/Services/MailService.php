@@ -26,21 +26,21 @@ class MailService
     {
         $tokenPath = storage_path('app/google-token.json');
 
-        if (!file_exists($tokenPath)) {
+        if (! file_exists($tokenPath)) {
             Log::error('Google token file not found.');
+
             return false;
         }
-
 
         $token = json_decode(file_get_contents($tokenPath), true);
         $this->client->setAccessToken($token);
 
         if ($this->client->isAccessTokenExpired()) {
-            if (!$this->client->getRefreshToken()) {
+            if (! $this->client->getRefreshToken()) {
                 Log::error('Missing refresh_token.');
+
                 return false;
             }
-
 
             $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
             $token = array_merge($token, $newToken);
@@ -53,7 +53,7 @@ class MailService
 
     private function sendEmail(string $view, array $data, string $to, string $subject): \Illuminate\Http\JsonResponse
     {
-        if (!$this->authorizeClient()) {
+        if (! $this->authorizeClient()) {
             return response()->json(['error' => 'Google token error.'], 500);
         }
 
@@ -77,10 +77,12 @@ class MailService
 
         try {
             $gmail->users_messages->send('me', $message);
+
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {
-            Log::error('Gmail Send Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
+            Log::error('Gmail Send Error: '.$e->getMessage());
+
+            return response()->json(['error' => 'Failed to send email: '.$e->getMessage()], 500);
 
         }
     }
@@ -92,8 +94,6 @@ class MailService
             'verification_expires_at' => $request['verification_expires_at'],
         ], $request['email'], 'Verification Code');
     }
-
-
 
     public function sendResetPasswordEmail(array $request)
     {

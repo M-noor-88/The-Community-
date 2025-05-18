@@ -7,13 +7,13 @@ use App\Models\VolunteerProfile;
 
 class VolunteerProfileRepository
 {
-
     public function get($userID)
     {
-        return VolunteerProfile::where('user_id' , $userID)
-            ->with(['image', 'location' ,'user'])
+        return VolunteerProfile::where('user_id', $userID)
+            ->with(['image', 'location', 'user'])
             ->first();
     }
+
     public function create(User $user, array $data, int $locationId, int $imageId)
     {
         return $user->volunteerProfile()->create([

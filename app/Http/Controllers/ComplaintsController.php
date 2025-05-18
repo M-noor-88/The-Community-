@@ -2,28 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
-use App\Traits\JsonResponseTrait;
-use Illuminate\Http\JsonResponse;
-use App\Services\ComplaintsService;
-use App\Services\PdfGeneratorService;
+use App\Http\Requests\ComplaintCategoryRequest;
 use App\Http\Requests\ComplaintRequest;
 use App\Http\Requests\FilterComplaintRequest;
 use App\Http\Requests\UpdateComplaintRequest;
-use App\Http\Requests\ComplaintCategoryRequest;
+use App\Services\ComplaintsService;
+use App\Services\PdfGeneratorService;
+use App\Traits\JsonResponseTrait;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ComplaintsController extends Controller
 {
     use JsonResponseTrait;
+
     protected ComplaintsService $complaintsService;
+
     protected PdfGeneratorService $pdfGeneratorService;
+
     public function __construct(ComplaintsService $complaintsService, PdfGeneratorService $pdfGeneratorService)
     {
         $this->pdfGeneratorService = $pdfGeneratorService;
         $this->complaintsService = $complaintsService;
     }
-
 
     public function filterComplaintsClient(FilterComplaintRequest $request): JsonResponse
     {
@@ -33,6 +35,7 @@ class ComplaintsController extends Controller
             if ($complaints['complaints']->isEmpty()) {
                 return $this->success('No complaints found', 204);
             }
+
             return $this->success($complaints, 'Complaints retrieved successfully');
         } catch (\Throwable $e) {
             return $this->error($e->getMessage(), 500);
@@ -47,6 +50,7 @@ class ComplaintsController extends Controller
             if ($complaints['complaints']->isEmpty()) {
                 return $this->success('No complaints found', 204);
             }
+
             return $this->success($complaints, 'Complaints retrieved successfully');
         } catch (\Throwable $e) {
             return $this->error($e->getMessage(), 500);
@@ -57,6 +61,7 @@ class ComplaintsController extends Controller
     {
         try {
             $complaint = $this->complaintsService->createComplaint($request->all());
+
             return $this->success($complaint, 'Complaint created successfully', 201);
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -67,6 +72,7 @@ class ComplaintsController extends Controller
     {
         try {
             $categories = $this->complaintsService->getComplaintCategories();
+
             return $this->success($categories, 'Categories retrieved successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -77,6 +83,7 @@ class ComplaintsController extends Controller
     {
         try {
             $complaint = $this->complaintsService->updateComplaintStatus($id, $request->all());
+
             return $this->success($complaint, 'Complaint status updated successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -87,6 +94,7 @@ class ComplaintsController extends Controller
     {
         try {
             $complaints = $this->complaintsService->getComplaintsByID($id);
+
             return $this->success($complaints, 'Complaints retrieved successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -97,6 +105,7 @@ class ComplaintsController extends Controller
     {
         try {
             $complaints = $this->complaintsService->createComplaintCategory($request['name']);
+
             return $this->success($complaints, 'category created  successfully', 201);
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -107,6 +116,7 @@ class ComplaintsController extends Controller
     {
         try {
             $complaints = $this->complaintsService->updateComplaintCategory($id, $request['name']);
+
             return $this->success($complaints, 'category updated successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -117,24 +127,27 @@ class ComplaintsController extends Controller
     {
         try {
             $complaints = $this->complaintsService->deleteComplaintCategory($id);
+
             return $this->success($complaints, 'category deleted successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
     }
 
-    public function  getFormalBook($id): StreamedResponse
+    public function getFormalBook($id): StreamedResponse
     {
         $pdf = $this->pdfGeneratorService->downloadFormalBook($id);
-        return $pdf->stream('complaint_' . $id . '.pdf');
+
+        return $pdf->stream('complaint_'.$id.'.pdf');
     }
 
     public function downloadFormalBook($id): StreamedResponse
     {
         $pdf = $this->pdfGeneratorService->downloadFormalBook($id);
+
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'complaint_' . $id . '.pdf', [
+        }, 'complaint_'.$id.'.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
     }

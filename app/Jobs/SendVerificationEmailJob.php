@@ -2,20 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Services\MailService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Google\Client;
-use Google\Service\Gmail;
-use Google\Service\Gmail\Message;
-use Illuminate\Support\Facades\Log;
-use App\Services\MailService;
 
 class SendVerificationEmailJob implements ShouldQueue
 {
-    use Queueable, SerializesModels, Dispatchable, InteractsWithQueue;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $mailData;
 
@@ -24,7 +20,7 @@ class SendVerificationEmailJob implements ShouldQueue
      */
     public function __construct(array $data)
     {
-        $this->mailData=$data;
+        $this->mailData = $data;
     }
 
     /**

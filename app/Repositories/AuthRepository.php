@@ -80,10 +80,9 @@ class AuthRepository
 
         $user = User::where('id', Auth::id())->first();
 
-        if($request['device_token'])
-        {
+        if ($request['device_token']) {
             $user->update([
-                'device_token' => $request['device_token']
+                'device_token' => $request['device_token'],
             ]);
             $user->save();
         }

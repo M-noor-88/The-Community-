@@ -24,16 +24,15 @@ class VolunteerProfileService
      */
     public function updateVolunteer($userID, array $data): VolunteerProfile
     {
-        if(!Auth::user()->hasRole('government_admin'))
-        {
-            throw new Exception("ليس لديك الصلاحية ");
+        if (! Auth::user()->hasRole('government_admin')) {
+            throw new Exception('ليس لديك الصلاحية ');
         }
         $user = User::with('volunteerProfile')->findOrFail($userID);
 
         return DB::transaction(function () use ($user, $data) {
             $locationId = $user->volunteerProfile->location->id;
             if (isset($data['latitude'], $data['longitude'])) {
-                $locationId = $this->locationRepo->update($data , $locationId);
+                $locationId = $this->locationRepo->update($data, $locationId);
             }
 
             $imageId = $user->volunteerProfile?->image_id;
@@ -49,27 +48,28 @@ class VolunteerProfileService
 
     public function deleteVolunteer($userID): bool
     {
-        $user = User::where('id' , $userID)->first();
+        $user = User::where('id', $userID)->first();
+
         return DB::transaction(fn () => $this->volunteerProfileRepo->delete($user));
     }
 
     public function showProfile(): array
     {
         $userID = Auth::id();
-        $profile =  $this->volunteerProfileRepo->get($userID);
+        $profile = $this->volunteerProfileRepo->get($userID);
 
-           return [
-               'name'=>$profile->user?->name,
-               'bio'=>$profile->bio,
-               'experience_years'=>$profile->experience_years,
-               'phone'=>$profile->phone,
-               'location' => [
-                   'longitude'=>$profile->location?->longitude,
-                   'latitude'=>$profile->location?->latitude,
-                   'area'=>$profile->location?->name
-               ],
-               'image'=> $profile->image->image_url?? "null",
-           ];
+        return [
+            'name' => $profile->user?->name,
+            'bio' => $profile->bio,
+            'experience_years' => $profile->experience_years,
+            'phone' => $profile->phone,
+            'location' => [
+                'longitude' => $profile->location?->longitude,
+                'latitude' => $profile->location?->latitude,
+                'area' => $profile->location?->name,
+            ],
+            'image' => $profile->image->image_url ?? 'null',
+        ];
 
     }
 }

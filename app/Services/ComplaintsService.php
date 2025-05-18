@@ -2,19 +2,17 @@
 
 namespace App\Services;
 
-
+use App\Enums\ComplaintStatus;
+use App\Http\Resources\ComplaintResource;
+use App\Models\ComplaintCategory;
 use App\Repositories\ComplaintsRepository;
-use App\Repositories\LocationRepository;
 use App\Repositories\ImageRepository;
+use App\Repositories\LocationRepository;
+use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\UploadedFile;
-use App\Enums\ComplaintStatus;
-use App\Models\ComplaintCategory;
-use App\Http\Resources\ComplaintResource;
-use  Exception;
-
 
 class ComplaintsService
 {
@@ -32,6 +30,7 @@ class ComplaintsService
             'complaint_categories' => $this->getComplaintCategories(),
             'complaint_locations' => $this->locationRepo->getAllLocations(),
         ];
+
         return $data;
     }
 
@@ -47,6 +46,7 @@ class ComplaintsService
         $FullConlaints = $complaints->map(function ($complaint) {
             return new ComplaintResource($complaint);
         });
+
         return $this->getResponseDetails($FullConlaints);
     }
 
@@ -57,6 +57,7 @@ class ComplaintsService
         $FullConlaints = $complaints->map(function ($complaint) {
             return new ComplaintResource($complaint);
         });
+
         return $this->getResponseDetails($FullConlaints);
     }
 
@@ -74,7 +75,7 @@ class ComplaintsService
             ]);
 
             $user = Auth::user();
-            if (!$user) {
+            if (! $user) {
                 throw new Exception('User not authenticated.');
             }
 
@@ -87,15 +88,16 @@ class ComplaintsService
                 'status' => 'انتظار',
             ]);
 
-            if (!empty($complaintImages)) {
+            if (! empty($complaintImages)) {
                 $images = is_array($complaintImages) ? $complaintImages : [$complaintImages];
                 $attachedImageIds = $this->storeImages($complaintImages);
-                Log::info('Attached Image IDs: ' . implode(', ', $attachedImageIds)); // Add this log inf
-                if (!empty($attachedImageIds)) {
+                Log::info('Attached Image IDs: '.implode(', ', $attachedImageIds)); // Add this log inf
+                if (! empty($attachedImageIds)) {
                     $complaint->complaintImages()->attach($attachedImageIds, ['type' => 'complaint']);
                 }
             }
             DB::commit();
+
             return ['complaint' => new ComplaintResource($complaint)];
         } catch (Exception $e) {
             DB::rollBack();
@@ -113,11 +115,11 @@ class ComplaintsService
         $attachedImageIds = [];
 
         $complaint = $this->complaintsRepo->getComplaintById($id);
-        if (!$complaint) {
+        if (! $complaint) {
             throw new \Exception('Complaint not found.');
         }
 
-        if (!ComplaintStatus::isValid($status)) {
+        if (! ComplaintStatus::isValid($status)) {
             throw new \InvalidArgumentException("Invalid status: $status");
         }
 
@@ -125,10 +127,10 @@ class ComplaintsService
         try {
             if ($status == 'منجزة') {
 
-                if (!empty($achievementImages)) {
+                if (! empty($achievementImages)) {
                     $images = is_array($achievementImages) ? $achievementImages : [$achievementImages];
                     $attachedImageIds = $this->storeImages($achievementImages);
-                    if (!empty($attachedImageIds)) {
+                    if (! empty($attachedImageIds)) {
                         $complaint->achievementImages()->attach($attachedImageIds, ['type' => 'achievement']);
                     }
                 }
@@ -137,6 +139,7 @@ class ComplaintsService
                 'status' => $status,
             ]);
             DB::commit();
+
             return ['complaint' => new ComplaintResource($complaint)];
         } catch (\Exception $e) {
             // Clean up image placeholder if it was created
@@ -163,14 +166,14 @@ class ComplaintsService
         return $attachedImageIds;
     }
 
-
     public function getComplaintsByID($id): array
     {
         // Get complaint
         $complaint = $this->complaintsRepo->getComplaintById($id);
-        if (!$complaint) {
+        if (! $complaint) {
             throw new \Exception('Complaint not found.');
         }
+
         return ['complaint' => new ComplaintResource($complaint)];
     }
 

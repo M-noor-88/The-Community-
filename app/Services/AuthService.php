@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Http\Requests\RegisterRequest;
-use App\Jobs\SendVerificationEmailJob;
 use App\Jobs\SendResetPasswordEmailJob;
+use App\Jobs\SendVerificationEmailJob;
 use App\Repositories\AuthRepository;
 use App\Repositories\ClientProfileRepository;
 use App\Repositories\ImageRepository;
@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
 
 class AuthService
 {
@@ -52,14 +51,13 @@ class AuthService
         $register_Data['skills'] = $request->skills;
         $register_Data['volunteer_fields'] = $request->volunteer_fields;
 
-
         //  Handle the image properly
         if ($request->hasFile('image')) {
             $image = $this->imageRepo->createPlaceholder();
             $this->imageRepo->storeTempImageAndDispatch($request['image'], $image->id);
 
             $register_Data['image_id'] = $image->id; // Save only the image ID
-        }else{
+        } else {
             $image = $this->imageRepo->createPlaceholder();
             $register_Data['image_id'] = $image->id; // Save only the image ID
         }
@@ -139,13 +137,11 @@ class AuthService
 
         $this->authRepository->initiateRegistration($data);
 
-
         SendVerificationEmailJob::dispatch([
-          'verification_code' => $data['verification_code'],
+            'verification_code' => $data['verification_code'],
             'verification_expires_at' => $data['verification_expires_at'],
             'email' => $email,
         ])->delay(now()->addSeconds(5)); // Delayed by 2 minutes
-
 
     }
 
@@ -160,8 +156,6 @@ class AuthService
         $data['email'] = $request['email'];
 
         $this->authRepository->cacheResetCode($data);
-
-
 
         SendResetPasswordEmailJob::dispatch([
             'reset_code' => $reset_code,

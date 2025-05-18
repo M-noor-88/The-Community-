@@ -13,12 +13,10 @@ use App\Models\Rating;
 use App\Models\User;
 use App\Models\VolunteerProfile;
 use App\Models\VoteProjectTotal;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsRepository
 {
-
     public function getBasicCounts(): array
     {
         return [
@@ -33,7 +31,7 @@ class StatisticsRepository
 
     public function getTopRatedProjects($limit = 5)
     {
-        return Project::where('type' , 'حملة رسمية')->where('status' , 'منجزة')
+        return Project::where('type', 'حملة رسمية')->where('status', 'منجزة')
             ->with([
                 'user',
                 'image',
@@ -43,7 +41,7 @@ class StatisticsRepository
                 'totalVotes',
                 'donations',
                 'donationSummary',
-                'participants',])
+                'participants', ])
             ->withAvg('ratings', 'rating')
             ->orderByDesc('ratings_avg_rating')
             ->take($limit)
@@ -52,7 +50,7 @@ class StatisticsRepository
 
     public function getMostParticipatedProjects($limit = 5)
     {
-        return  Project::where('type' , 'حملة رسمية')->whereIn('status' , ['منجزة' ,'نشطة'])
+        return Project::where('type', 'حملة رسمية')->whereIn('status', ['منجزة', 'نشطة'])
             ->with([
                 'user',
                 'image',
@@ -62,7 +60,7 @@ class StatisticsRepository
                 'totalVotes',
                 'donations',
                 'donationSummary',
-                'participants',])
+                'participants', ])
             ->withCount('participants')
             ->orderByDesc('participants_count')
             ->take($limit)
@@ -82,7 +80,6 @@ class StatisticsRepository
             ->get();
     }
 
-
     public function getUserRoleDistribution(): array
     {
         return [
@@ -90,7 +87,6 @@ class StatisticsRepository
             'clients' => ClientProfile::count(),
         ];
     }
-
 
     // 1. حملات رسمية
     public function getOfficialCampaignsWithLocation()
@@ -100,23 +96,20 @@ class StatisticsRepository
             ->get(['id', 'title',  'type', 'location_id']);
     }
 
-// 2. مبادرات
+    // 2. مبادرات
     public function getInitiativesWithLocation()
     {
         return Project::where('type', 'مبادرة')
             ->with('location:id,latitude,longitude')
-            ->get(['id' , 'title','type', 'location_id']);
+            ->get(['id', 'title', 'type', 'location_id']);
     }
 
-// 3. Complaints with location and category
+    // 3. Complaints with location and category
     public function getComplaintsWithLocationAndCategory()
     {
         return Complaint::with(['location:id,latitude,longitude', 'category:id,name'])
-            ->get(['id', 'title','location_id', 'complaint_category_id']);
+            ->get(['id', 'title', 'location_id', 'complaint_category_id']);
     }
-
-
-
 
     public function getMonthlyCounts()
     {
@@ -134,9 +127,9 @@ class StatisticsRepository
 
                 return [
                     'month' => $row->month,
-                    'official_campaigns' => (int)$row->official_campaigns,
-                    'initiatives' => (int)$row->initiatives,
-                    'complaints' => $complaintsCount
+                    'official_campaigns' => (int) $row->official_campaigns,
+                    'initiatives' => (int) $row->initiatives,
+                    'complaints' => $complaintsCount,
 
                 ];
             });
@@ -150,16 +143,13 @@ class StatisticsRepository
             ->selectRaw("SUM(status = 'منجزة') as Completed")
             ->selectRaw("SUM(status = 'ملغية') as Canceled ")
             ->get()
-            ->map(function($raw) {
+            ->map(function ($raw) {
                 return [
-                    'votes' => (int)$raw->votes,
-                    'Active' => (int)$raw->Active,
-                    'Completed' => (int)$raw->Completed,
-                    'Canceled'=>(int) $raw->Canceled
+                    'votes' => (int) $raw->votes,
+                    'Active' => (int) $raw->Active,
+                    'Completed' => (int) $raw->Completed,
+                    'Canceled' => (int) $raw->Canceled,
                 ];
             });
     }
-
-
-
 }

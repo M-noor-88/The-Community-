@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Google\Client;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class GoogleController extends Controller
 {
     public function redirect()
     {
-        $client = new Client();
+        $client = new Client;
         $client->setClientId(config('services.google.client_id'));
         $client->setClientSecret(config('services.google.client_secret'));
         $client->setRedirectUri(config('services.google.redirect_uri'));
@@ -19,21 +19,21 @@ class GoogleController extends Controller
         $client->setPrompt('consent');
 
         $authUrl = $client->createAuthUrl();
-        Log::info('Google Auth URL: ' . $authUrl);
+        Log::info('Google Auth URL: '.$authUrl);
 
         return redirect($authUrl);
     }
 
     public function callback(Request $request)
     {
-        $client = new Client();
+        $client = new Client;
         $client->setClientId(config('services.google.client_id'));
         $client->setClientSecret(config('services.google.client_secret'));
         $client->setRedirectUri(config('services.google.redirect_uri'));
 
         $code = $request->query('code');
 
-        if (!$code) {
+        if (! $code) {
             return response()->json(['error' => 'Authorization code not found.'], 400);
         }
 

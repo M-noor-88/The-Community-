@@ -70,8 +70,6 @@ class StatisticsService
         return $this->statisticsRepo->getVotesSummary();
     }
 
-
-
     public function getUserRoleDistribution(): array
     {
         return $this->statisticsRepo->getUserRoleDistribution();
@@ -85,14 +83,13 @@ class StatisticsService
             ->get();
     }
 
-
     // حملات رسمية
     public function getOfficialCampaigns(): array
     {
         return $this->statisticsRepo->getOfficialCampaignsWithLocation()
             ->map(function ($project) {
                 return [
-                    'title'=> $project->title,
+                    'title' => $project->title,
                     'type' => $project->type,
                     'latitude' => $project->location?->latitude,
                     'longitude' => $project->location?->longitude,
@@ -100,13 +97,13 @@ class StatisticsService
             })->toArray();
     }
 
-// مبادرات
+    // مبادرات
     public function getInitiativeProjects(): array
     {
         return $this->statisticsRepo->getInitiativesWithLocation()
             ->map(function ($project) {
                 return [
-                    'title'=> $project->title,
+                    'title' => $project->title,
                     'type' => $project->type,
                     'latitude' => $project->location?->latitude,
                     'longitude' => $project->location?->longitude,
@@ -114,13 +111,13 @@ class StatisticsService
             })->toArray();
     }
 
-// Complaints
+    // Complaints
     public function getComplaintStatistics(): array
     {
         return $this->statisticsRepo->getComplaintsWithLocationAndCategory()
             ->map(function ($complaint) {
                 return [
-                    'title'=> $complaint->title,
+                    'title' => $complaint->title,
                     'category' => $complaint->category?->name,
                     'latitude' => $complaint->location?->latitude,
                     'longitude' => $complaint->location?->longitude,
@@ -133,10 +130,8 @@ class StatisticsService
         return $this->statisticsRepo->getMonthlyCounts()->toArray();
     }
 
-
     public function getNumberStatusProjects()
     {
         return $this->statisticsRepo->getNumberStatusProjects();
     }
-
 }

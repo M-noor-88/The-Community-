@@ -152,15 +152,13 @@ class ProjectRepository
         return $project->delete();
     }
 
-
     // Recommendation
-    public function getRecommendations($userID ,$status = null , $type = null): LengthAwarePaginator
+    public function getRecommendations($userID, $status = null, $type = null): LengthAwarePaginator
     {
         $topCategories = DB::table('user_interests')
             ->where('user_id', $userID)
             ->orderByDesc('interest_score')
             ->pluck('category_id');
-
 
         $query = Project::with([
             'user.clientProfile',
@@ -174,20 +172,15 @@ class ProjectRepository
             'participants',
         ])->whereIn('category_id', $topCategories);
 
-        if($status != null)
-        {
+        if ($status != null) {
             $query->where('status', $status);
         }
 
-        if($type != null)
-        {
+        if ($type != null) {
             $query->where('type', $type);
         }
 
-
-
         return $query->paginate(10);
-
 
     }
 }

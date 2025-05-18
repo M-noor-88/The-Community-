@@ -24,7 +24,7 @@ class ComplaintRequest extends FormRequest
             'complaintImages.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB max
             'title' => 'required|string|max:255',
             'description' => 'required|string', // ✅ FIXED
-            'complaint_category_id' => 'required|exists:complaint_categories,id' // ✅ SPECIFIED COLUMN
+            'complaint_category_id' => 'required|exists:complaint_categories,id', // ✅ SPECIFIED COLUMN
         ];
     }
 }

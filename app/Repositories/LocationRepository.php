@@ -18,18 +18,17 @@ class LocationRepository
         ]);
     }
 
-
     public function getAllLocations()
-{
-    return Location::select('id', 'name')
-        ->get()
-        ->map(function ($location) {
-            return [
-                'location_id' => $location->id,
-                'name' => $location->name,
-            ];
-        });
-}
+    {
+        return Location::select('id', 'name')
+            ->get()
+            ->map(function ($location) {
+                return [
+                    'location_id' => $location->id,
+                    'name' => $location->name,
+                ];
+            });
+    }
 
     public function update(array $data, int $locationId): int
     {

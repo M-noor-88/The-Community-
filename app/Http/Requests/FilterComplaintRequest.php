@@ -1,6 +1,9 @@
 <?php
+
 namespace App\Http\Requests;
+
 use Illuminate\Foundation\Http\FormRequest;
+
 class FilterComplaintRequest extends FormRequest
 {
     /**
@@ -12,6 +15,7 @@ class FilterComplaintRequest extends FormRequest
     {
         return true;
     }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,8 +27,7 @@ class FilterComplaintRequest extends FormRequest
             'status' => 'nullable|string',
             'category_id' => 'nullable|integer|exists:complaint_categories,id',
             'nearby' => 'nullable|boolean',
-            'location_id' => 'nullable|integer|exists:locations,id'
+            'location_id' => 'nullable|integer|exists:locations,id',
         ];
     }
-
 }

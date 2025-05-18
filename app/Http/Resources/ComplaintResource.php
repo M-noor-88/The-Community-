@@ -46,5 +46,4 @@ class ComplaintResource extends JsonResource
             }),
         ];
     }
-
 }

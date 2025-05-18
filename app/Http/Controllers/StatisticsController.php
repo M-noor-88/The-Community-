@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Services\StatisticsService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class StatisticsController extends Controller
 {
     public function __construct(protected StatisticsService $statisticsService) {}
-
 
     public function weeklyParticipation(): JsonResponse
     {
@@ -62,13 +60,12 @@ class StatisticsController extends Controller
         return $this->makeResponse('User role distribution fetched successfully', $this->statisticsService->getUserRoleDistribution());
     }
 
-
     public function getOfficialCampaigns()
     {
         return response()->json([
             'success' => true,
             'message' => 'Official campaigns statistics fetched successfully',
-            'data' => $this->statisticsService->getOfficialCampaigns()
+            'data' => $this->statisticsService->getOfficialCampaigns(),
         ]);
     }
 
@@ -77,7 +74,7 @@ class StatisticsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Initiative statistics fetched successfully',
-            'data' => $this->statisticsService->getInitiativeProjects()
+            'data' => $this->statisticsService->getInitiativeProjects(),
         ]);
     }
 
@@ -86,17 +83,16 @@ class StatisticsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Complaint statistics fetched successfully',
-            'data' => $this->statisticsService->getComplaintStatistics()
+            'data' => $this->statisticsService->getComplaintStatistics(),
         ]);
     }
-
 
     protected function makeResponse(string $message, $data): JsonResponse
     {
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
@@ -105,16 +101,16 @@ class StatisticsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Monthly statistics fetched successfully',
-            'data' => $this->statisticsService->getMonthlyStatistics()
+            'data' => $this->statisticsService->getMonthlyStatistics(),
         ]);
     }
 
-    public function getNumberProjectsStatus() {
+    public function getNumberProjectsStatus()
+    {
         return response()->json([
             'success' => true,
             'message' => 'Monthly statistics fetched successfully',
-            'data' => $this->statisticsService->getNumberStatusProjects()
+            'data' => $this->statisticsService->getNumberStatusProjects(),
         ]);
     }
-
 }

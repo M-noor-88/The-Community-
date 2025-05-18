@@ -31,7 +31,7 @@ class ProjectCreateRequest extends FormRequest
             'number_of_participant' => 'nullable|int',
             'required_amount' => 'nullable|int',
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // Max 2MB
-            'execution_date'=> 'nullable'
+            'execution_date' => 'nullable',
         ];
     }
 }

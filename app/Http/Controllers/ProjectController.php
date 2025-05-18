@@ -120,21 +120,20 @@ class ProjectController extends Controller
         }
     }
 
-
     // Recommend projects based on user behaviour | you can filter by status
     public function recommendations(Request $request): JsonResponse
     {
         $request->validate([
             'status' => 'nullable|in:نشطة,منجزة',
-            'type' => 'nullable|in:حملة رسمية,مبادرة'
+            'type' => 'nullable|in:حملة رسمية,مبادرة',
         ]);
 
         try {
-            $data = $this->projectService->getRecommendation($request->status , $request->type);
-            return $this->success($data , "مشاريع مقترحة لك بناءا على تفاعلاتك السابقة");
-        } catch(Exception $e)
-        {
-            return $this->error("Error Get recommendations ". $e->getMessage());
+            $data = $this->projectService->getRecommendation($request->status, $request->type);
+
+            return $this->success($data, 'مشاريع مقترحة لك بناءا على تفاعلاتك السابقة');
+        } catch (Exception $e) {
+            return $this->error('Error Get recommendations '.$e->getMessage());
         }
     }
 }

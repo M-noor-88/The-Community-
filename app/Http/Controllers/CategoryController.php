@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     use JsonResponseTrait;
+
     public function __construct(protected CategoryService $categoryService) {}
 
     /**
@@ -24,7 +25,7 @@ class CategoryController extends Controller
 
         $category = $this->categoryService->create($validated);
 
-        return $this->success($category,  'Category created successfully', 201);
+        return $this->success($category, 'Category created successfully', 201);
     }
 
     public function index(): JsonResponse
@@ -38,6 +39,6 @@ class CategoryController extends Controller
     {
         $this->categoryService->delete($id);
 
-        return $this->success([] , 'Category deleted successfully');
+        return $this->success([], 'Category deleted successfully');
     }
 }
