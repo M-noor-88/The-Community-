@@ -7,9 +7,11 @@ use App\Models\Complaint;
 use App\Models\Location;
 use App\Models\User;
 use App\Enums\ComplaintStatus;
+use App\Models\Region;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use \Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class ComplaintsRepository
 {
@@ -18,10 +20,12 @@ class ComplaintsRepository
         return  Complaint::create([
             'user_id' => $data['user_id'],
             'location_id' => $data['location_id'],
+            'region' => $data['region'],
             'complaint_category_id' => $data['complaint_category_id'],
             'title' => $data['title'],
             'description' => $data['description'],
-            'status' => $data['status']
+            'status' => $data['status'],
+            'priority_points' => $data['priority_points'],
         ]);
     }
 
@@ -43,16 +47,25 @@ class ComplaintsRepository
             $query->where('complaint_category_id', $filters['category_id']);
         }
 
-        if (!empty($filters['location_id'])) {
-            if (!Location::where('id', $filters['location_id'])->exists()) {
-                throw new \InvalidArgumentException("Invalid location ID: {$filters['location_id']}");
+        if (!empty($filters['region'])) {
+            if(!Region::where('name', $filters['region'])->exists()){
+                throw new \InvalidArgumentException("Invalid region : {$filters['region']}");
             }
-            $query->where('location_id', $filters['location_id']);
+            $query->where('region', $filters['region']);
         }
+
+        if (isset($filters['userComplaints']) && $filters['userComplaints'] == 1) {
+            $userId = Auth::id();
+            if (!Complaint::where('user_id', $userId)->exists()) {
+                throw new \InvalidArgumentException("No complaints found for the authenticated user.");
+            }
+            $query->where('user_id', $userId);
+        }
+
         return $query;
     }
 
-    public function applyNearbyFilter($query, int $distance = 100): Builder
+    public function applyNearbyFilter($query, $distance ): Builder
     {
         $user = Auth::user();
         if ($user) {
@@ -67,7 +80,7 @@ class ComplaintsRepository
         $longitude = $user->clientProfile->location->longitude;
 
         return $query->join('locations', 'complaints.location_id', '=', 'locations.id')
-        ->select('complaints.*') // ✅ force correct columns
+        ->select('complaints.*')
             ->whereRaw(
                 '(6371 * acos(
                     cos(radians(?)) * cos(radians(locations.latitude)) *
@@ -103,10 +116,11 @@ class ComplaintsRepository
         });
     }
 
-    public function createComplaintCategory($name): ComplaintCategory
+    public function createComplaintCategory($name, $points): ComplaintCategory
     {
         return ComplaintCategory::create([
             'name' => $name,
+            'points' => $points,
         ]);
     }
 
@@ -123,5 +137,10 @@ class ComplaintsRepository
         $category = ComplaintCategory::findOrFail($id);
 
         return $category->delete();
+    }
+
+    public function getComplaintCategoryById($id): ComplaintCategory
+    {
+        return ComplaintCategory::findOrFail($id);
     }
 }

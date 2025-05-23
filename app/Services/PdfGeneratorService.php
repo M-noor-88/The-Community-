@@ -35,7 +35,7 @@ class PdfGeneratorService
             'complaint_description' => $complaint->description,
             'complaint_location' => $complaint->location->name,
             'phone' => $complaint->user->clientProfile->phone,
-            'achievementImages' => $complaint->achievementImages,
+            'complaintImages' => $complaint->complaintImages,
         ];
 
 

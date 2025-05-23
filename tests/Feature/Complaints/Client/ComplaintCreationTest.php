@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\ComplaintCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Location;
+use App\Models\Region;
 
 class ComplaintCreationTest extends TestCase
 {
@@ -18,14 +19,14 @@ class ComplaintCreationTest extends TestCase
         $user = User::factory()->create();
         $location = Location::factory()->create();
         $category = ComplaintCategory::factory()->create();
+        $region =Region::factory()->create();
 
         $this->actingAs($user, 'sanctum');
 
         $response = $this->postJson('api/client/complaint/create', [
-            'user_id' => $user->id,
             'latitude' => $location->latitude,
             'longitude' => $location->longitude,
-            'area' => $location->name,
+            'region' => $region->name,
             'complaintImages' => [
                 '' => [
                     'URL_ADDRESS.com/image1' => [
@@ -36,8 +37,11 @@ class ComplaintCreationTest extends TestCase
             'complaint_category_id' => $category->id,
             'title' => 'Noise Pollution',
             'description' => 'Loud noise every night',
-            'status' => 'انتظار',
         ]);
+
+        //dd($response);
+
+
 
         $response->assertStatus(201)
                  ->assertJsonFragment(['status' => true]);

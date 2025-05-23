@@ -38,6 +38,8 @@ class ComplaintsRepositoryTest extends TestCase
             'title' => 'Noise Pollution',
             'description' => 'Too much noise at night.',
             'status' => 'انتظار',
+            'region' => 'القاهرة',
+            'priority_points' => 10,
         ];
 
         $complaint = $this->repository->create($data);
@@ -153,7 +155,7 @@ class ComplaintsRepositoryTest extends TestCase
 
     public function test_create_complaint_category()
     {
-        $category = $this->repository->createComplaintCategory('Water Issue');
+        $category = $this->repository->createComplaintCategory('Water Issue',5);
         $this->assertDatabaseHas('complaint_categories', ['name' => 'Water Issue']);
         $this->assertEquals('Water Issue', $category->name);
     }
@@ -231,6 +233,6 @@ class ComplaintsRepositoryTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('User location not set.');
 
-        $this->repository->applyNearbyFilter(Complaint::query());
+        $this->repository->applyNearbyFilter(Complaint::query(), 10);
     }
 }

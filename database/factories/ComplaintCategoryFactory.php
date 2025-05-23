@@ -18,6 +18,7 @@ class ComplaintCategoryFactory extends Factory
     {
         return [
             'name' => $this->faker->word,
+            'points' => 10,
         ];
     }
 }

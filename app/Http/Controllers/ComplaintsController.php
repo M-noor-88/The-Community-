@@ -12,6 +12,7 @@ use App\Http\Requests\FilterComplaintRequest;
 use App\Http\Requests\UpdateComplaintRequest;
 use App\Http\Requests\ComplaintCategoryRequest;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Http\Request;
 
 class ComplaintsController extends Controller
 {
@@ -28,7 +29,7 @@ class ComplaintsController extends Controller
     public function filterComplaintsClient(FilterComplaintRequest $request): JsonResponse
     {
         try {
-            $filters = $request->only(['status', 'category_id', 'nearby', 'location_id']);
+            $filters = $request->only(['status', 'category_id', 'distance', 'region', 'userComplaints']);
             $complaints = $this->complaintsService->filterComplaintsClient($filters);
             if ($complaints['complaints']->isEmpty()) {
                 return $this->success('No complaints found', 204);
@@ -42,7 +43,7 @@ class ComplaintsController extends Controller
     public function filterComplaintsAdmin(FilterComplaintRequest $request): JsonResponse
     {
         try {
-            $filters = $request->only(['status', 'category_id', 'location_id']);
+            $filters = $request->only(['status', 'category_id', 'region']);
             $complaints = $this->complaintsService->filterComplaintsAdmin($filters);
             if ($complaints['complaints']->isEmpty()) {
                 return $this->success('No complaints found', 204);
@@ -96,7 +97,7 @@ class ComplaintsController extends Controller
     public function createCategory(ComplaintCategoryRequest $request): JsonResponse
     {
         try {
-            $complaints = $this->complaintsService->createComplaintCategory($request['name']);
+            $complaints = $this->complaintsService->createComplaintCategory($request['name'],$request['points']);
             return $this->success($complaints, 'category created  successfully', 201);
         } catch (Exception $e) {
             return $this->error($e->getMessage());
@@ -137,5 +138,15 @@ class ComplaintsController extends Controller
         }, 'complaint_' . $id . '.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
+    }
+
+    public function update(Request $request, $id): JsonResponse
+    {
+        try {
+            $complaints = $this->complaintsService->updateComplaint($id, $request->all());
+            return $this->success($complaints, 'Complaint updated successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
     }
 }
