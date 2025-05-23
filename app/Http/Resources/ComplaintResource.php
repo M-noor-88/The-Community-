@@ -16,6 +16,8 @@ class ComplaintResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'points' =>$this->priority_points,
+            'region' => $this->region,
             'title' => $this->title,
             'description' => $this->description,
             'status' => $this->status,
@@ -34,13 +36,13 @@ class ComplaintResource extends JsonResource
             ],
             'achievement_images' => $this->achievementImages->map(function ($image) {
                 return [
-                    'id' => $image->id,
+                    'achievement_image_id' => $image->id,
                     'url' => $image->image_url,
                 ];
             }),
             'complaint_images' => $this->complaintImages->map(function ($image) {
                 return [
-                    'id' => $image->id,
+                    'complaint_image_id' => $image->id,
                     'url' => $image->image_url,
                 ];
             }),

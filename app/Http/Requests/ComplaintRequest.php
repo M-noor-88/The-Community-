@@ -19,7 +19,7 @@ class ComplaintRequest extends FormRequest
         return [
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
-            'area' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
             'complaintImages' => 'nullable|array',
             'complaintImages.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB max
             'title' => 'required|string|max:255',

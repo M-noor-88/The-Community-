@@ -23,6 +23,8 @@ class ComplaintFactory extends Factory
             'title' => $this->faker->word,
             'description' => $this->faker->paragraph,
             'status' => 'انتظار',
+           'region' => $this->faker->word,
+            'priority_points' => $this->faker->randomNumber(1,10),
         ];
     }
 }

@@ -44,15 +44,14 @@
 <body>
     <h2>كتاب شكوى رسمي</h2>
     <p>السادة محافظة دمشق المحترمون،</p>
-    <p>نقدم لكم هذه الشكوى من السيد: <strong>{{ $data['name'] }}</strong></p>
+    <p>نقدم لكم هذه الشكوى من السيد/ة: <strong>{{ $data['name'] }}</strong></p>
     <p>عنوان الشكوى: <strong>{{ $data['complaint_title'] }}</strong></p>
     <p>وصف الشكوى: <strong>{{ $data['complaint_description'] }}</strong></p>
     <p> العنوان: <strong>{{ $data['complaint_location'] }}</strong></p>
 
-    @if (!empty($data['achievementImages']) && $data['achievementImages']->isNotEmpty())
-    <h3 style="margin-top: 40px;">صور الإنجاز:</h3>
+    @if (!empty($data['complaintImages']) && $data['complaintImages']->isNotEmpty())
     <table width="100%" cellpadding="10" cellspacing="0">
-        @foreach ($data['achievementImages']->chunk(2) as $chunk)
+        @foreach ($data['complaintImages']->chunk(2) as $chunk)
             <tr>
                 @foreach ($chunk as $index => $image)
                     <td align="center" valign="top" style="border: 1px solid #ccc;">
@@ -71,7 +70,7 @@
 
 
     <div class="footer">
-        <p>يرجى التفضل بالاطلاع والموافقة،</p>
+        <p>يرجى التفضل بالاطلاع وإجراء الحل الأنسب</p>
         <p><strong>The-Community</strong></p>
         <p><strong>رقم مقدم الشكوى :</strong> {{ $data['phone'] }}</p>
 

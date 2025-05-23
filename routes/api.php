@@ -105,6 +105,7 @@ Route::prefix('client/complaint')
     Route::post('/all' , 'filterComplaintsClient');
     Route::get('/ByID/{id}' , 'complaintsByID');    //get complaints by id
     Route::get('/category/all', 'getAllCategories');
+    Route::post('/update/{id}', 'update');
 
 });
 

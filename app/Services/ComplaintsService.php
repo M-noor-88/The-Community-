@@ -13,6 +13,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\ComplaintScoringService;
 
 class ComplaintsService
 {
@@ -20,6 +21,7 @@ class ComplaintsService
         private LocationRepository $locationRepo,
         private ImageRepository $imageRepo,
         private ComplaintsRepository $complaintsRepo,
+        private ComplaintScoringService $pointsService
     ) {}
 
     public function getResponseDetails($complaints): array
@@ -28,7 +30,7 @@ class ComplaintsService
             'total' => $complaints->count(),
             'complaints' => $complaints,
             'complaint_categories' => $this->getComplaintCategories(),
-            'complaint_locations' => $this->locationRepo->getAllLocations(),
+            'regions' => $this->locationRepo->getAllRegion(),
         ];
 
         return $data;
@@ -38,8 +40,8 @@ class ComplaintsService
     {
         $complaints = $this->complaintsRepo->applyCommonFilters($filters);
 
-        if (isset($filters['nearby']) && $filters['nearby']) {
-            $complaints = $this->complaintsRepo->applyNearbyFilter($complaints);
+        if (isset($filters['distance'])) {
+            $complaints = $this->complaintsRepo->applyNearbyFilter($complaints, $filters['distance']);
         }
         $complaints = $complaints->get();
 
@@ -53,7 +55,7 @@ class ComplaintsService
     public function filterComplaintsAdmin(array $filters): array
     {
         $complaints = $this->complaintsRepo->applyCommonFilters($filters);
-        $complaints = $complaints->get();
+        $complaints = $complaints->orderByDesc('priority_points')->get();
         $FullConlaints = $complaints->map(function ($complaint) {
             return new ComplaintResource($complaint);
         });
@@ -65,13 +67,17 @@ class ComplaintsService
     {
         $complaintImages = $request['complaintImages'] ?? [];
         $attachedImageIds = [];
+        $title = $request['title'];
+        $region=$request['region'];
+        $description = $request['description'];
+        $categoryId=$request['complaint_category_id'];
         DB::beginTransaction();
 
         try {
             $location_id = $this->locationRepo->create([
                 'latitude' => $request['latitude'],
                 'longitude' => $request['longitude'],
-                'area' => $request['area'] ?? 'غير معروف',
+                'region' => $request['region'] ?? 'غير معروف',
             ]);
 
             $user = Auth::user();
@@ -79,13 +85,17 @@ class ComplaintsService
                 throw new Exception('User not authenticated.');
             }
 
+            $points=$this->pointsService->calculate($title, $description, $region, $categoryId);
+
             $complaint = $this->complaintsRepo->create([
                 'user_id' => $user->id,
-                'complaint_category_id' => $request['complaint_category_id'],
+                'complaint_category_id' => $categoryId,
                 'location_id' => $location_id,
-                'title' => $request['title'],
-                'description' => $request['description'] ?? null,
+                'region' => $request['region'] ,
+                'title' => $title,
+                'description' => $description ?? null,
                 'status' => 'انتظار',
+                'priority_points' => $points,
             ]);
 
             if (! empty($complaintImages)) {
@@ -183,10 +193,10 @@ class ComplaintsService
         return $this->complaintsRepo->getComplaintCategories();
     }
 
-    public function createComplaintCategory($name): ComplaintCategory
+    public function createComplaintCategory($name, $points = null): ComplaintCategory
     {
-
-        return $this->complaintsRepo->createComplaintCategory($name);
+        $points = $points ?? 5; // fallback to 5 if null
+        return $this->complaintsRepo->createComplaintCategory($name, $points);
     }
 
     public function updateComplaintCategory($id, $name): ComplaintCategory
@@ -197,5 +207,38 @@ class ComplaintsService
     public function deleteComplaintCategory($id): void
     {
         $this->complaintsRepo->deleteComplaintCategory($id);
+    }
+
+    public function updateComplaint($id, array $request): array
+    {
+        $complaint_images = $request['complaint_images'] ?? [];
+        $attachedImageIds = [];
+
+        $complaint = $this->complaintsRepo->getComplaintById($id);
+        if (!$complaint) {
+            throw new \Exception('Complaint not found.');
+        }
+
+
+        DB::beginTransaction();
+        try {
+
+                if (!empty($complaint_images)) {
+                    $images = is_array($complaint_images) ? $complaint_images : [$complaint_images];
+                    $attachedImageIds = $this->storeImages($complaint_images);
+                    if (!empty($attachedImageIds)) {
+                        $complaint->complaintImages()->attach($attachedImageIds, ['type' => 'complaint']);
+                    }
+                }
+            DB::commit();
+            return ['complaint' => new ComplaintResource($complaint)];
+        } catch (\Exception $e) {
+            // Clean up image placeholder if it was created
+            foreach ($attachedImageIds as $imageId) {
+                $this->imageRepo->deleteImagePlaceholder($imageId);
+            }
+            DB::rollBack();
+            throw $e;
+        }
     }
 }

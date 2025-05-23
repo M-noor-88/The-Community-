@@ -22,6 +22,7 @@ class UpdateComplaintRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'status' => 'nullable|string',
             'achievementImages' => 'nullable|array',
             'achievementImages.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB max
         ];

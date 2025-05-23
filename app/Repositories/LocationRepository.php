@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Location;
 use Illuminate\Support\Facades\DB;
+use App\Models\Region;
 
 class LocationRepository
 {
@@ -12,7 +13,7 @@ class LocationRepository
         return DB::table('locations')->insertGetId([
             'latitude' => $data['latitude'],
             'longitude' => $data['longitude'],
-            'name' => $data['area'] ?? 'غير معروف',
+            'name' => $data['region'] ?? 'غير معروف',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -41,5 +42,14 @@ class LocationRepository
         ]);
 
         return $location->id;
+    }
+
+    public function getRegion($region)
+    {
+        return Region::where('name', $region)->firstOrFail();
+    }
+    public function getAllRegion()
+    {
+        return Region::select('id as region_id', 'name')->get();
     }
 }

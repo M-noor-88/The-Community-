@@ -9,6 +9,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 class RolesAndUsersSeeder extends Seeder
 {
@@ -58,6 +59,46 @@ class RolesAndUsersSeeder extends Seeder
                 'experience_years'=> 3
             ]);
         });
+
+
+        // Create 5 real Arabic clients
+$arabicClients = [
+    ['name' => 'أحمد محمد', 'email' => 'ahmad@example.com'],
+    ['name' => 'ليلى خالد', 'email' => 'layla@example.com'],
+    ['name' => 'سارة يوسف', 'email' => 'sara@example.com'],
+    ['name' => 'محمود علي', 'email' => 'mahmoud@example.com'],
+    ['name' => 'فاطمة حسين', 'email' => 'fatima@example.com'],
+];
+
+foreach ($arabicClients as $clientData) {
+    $user = User::create([
+        'name' => $clientData['name'],
+        'email' => $clientData['email'],
+        'password' => Hash::make('password'), // Default password
+        'email_verified_at' => now(),
+        'device_token' => Str::random(10),
+        'verification_code' => Str::random(10),
+        'verification_expires_at' => now()->addMinutes(10),
+        'remember_token' => Str::random(10),
+    ]);
+
+    $user->assignRole('client');
+
+    // Create profile
+    $profile = $user->clientProfile()->create([
+        'phone' => fake()->phoneNumber(),
+        'bio' => fake()->text(),
+        'location_id' => 1,
+        'gender' => fake()->randomElement(['male', 'female']),
+        'age'=> 22,
+        'image_id'=> 1
+    ]);
+
+    // Attach random skills & fields
+    $profile->skills()->attach($skills->random(rand(1, 3))->pluck('id')->toArray());
+    $profile->fields()->attach($fields->random(rand(1, 2))->pluck('id')->toArray());
+}
+
 
         // Create Government Admin
         User::factory()->create([

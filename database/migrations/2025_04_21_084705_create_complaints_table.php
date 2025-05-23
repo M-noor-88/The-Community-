@@ -16,8 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('complaint_category_id')->constrained('complaint_categories')->onDelete('cascade');
             $table->foreignId('location_id')->nullable()->constrained('locations')->onDelete('set null');
+            $table->string('region')->nullable(); // Add the 'region' column with nullable constraint
             $table->string('title');
             $table->text('description')->nullable();
+            $table->unsignedInteger('priority_points')->default(0);
             $table->enum('status', ['انتظار', 'تم التحقق' , 'مرفوضة' , 'يتم التنفيذ' , 'منجزة'])->default('انتظار');
             $table->timestamps();
         });

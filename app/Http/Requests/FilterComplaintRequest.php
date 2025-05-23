@@ -26,8 +26,9 @@ class FilterComplaintRequest extends FormRequest
         return [
             'status' => 'nullable|string',
             'category_id' => 'nullable|integer|exists:complaint_categories,id',
-            'nearby' => 'nullable|boolean',
-            'location_id' => 'nullable|integer|exists:locations,id',
+            'distance' => 'nullable|integer',
+            'region' => 'nullable|string',
+            'userComplaints' => 'nullable|boolean'
         ];
     }
 }

@@ -12,7 +12,7 @@ class ComplaintCategory extends Model
 
     protected $table = 'complaint_categories';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'points'];
 
     public function complaints(): HasMany
     {
