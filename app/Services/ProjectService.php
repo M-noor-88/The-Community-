@@ -209,11 +209,19 @@ class ProjectService
     public function myProjects()
     {
         $userId = Auth::id();
-        $projects = Project::with(['category', 'location', 'image', 'ratings.user', 'user'])
-            ->where('user_id', $userId)
-            ->latest()
-            ->get();
 
+        $query = Project::with(['category', 'location', 'image', 'ratings.user', 'user'])
+            ->where('user_id', $userId);
+
+        $user = User::where('id' , $userId)->first();
+
+        if($user->hasRole('client'))
+        {
+            $projects = $query->where('type' , 'مبادرة')->latest()->get();
+            return  $projects->map(fn ($project) => $this->transformProject($project));
+        }
+
+        $projects = $query->where('type', 'حملة رسمية')->latest()->get();
         return $projects->map(fn ($project) => $this->transformProject($project));
     }
 
