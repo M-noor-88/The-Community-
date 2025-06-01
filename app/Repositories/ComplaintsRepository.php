@@ -7,7 +7,6 @@ use App\Models\Complaint;
 use App\Models\ComplaintCategory;
 use App\Models\Location;
 use App\Models\User;
-use App\Enums\ComplaintStatus;
 use App\Models\Region;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,7 +20,7 @@ class ComplaintsRepository
         return Complaint::create([
             'user_id' => $data['user_id'],
             'location_id' => $data['location_id'],
-            'region' => $data['region'],
+            'region' => $data['area'],
             'complaint_category_id' => $data['complaint_category_id'],
             'title' => $data['title'],
             'description' => $data['description'],

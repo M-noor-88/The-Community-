@@ -4,17 +4,14 @@ namespace Tests\Feature\Complaints\Admin;
 
 use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\ComplaintCategory;
 
 class CategoryManagementTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_admin_can_create_category()
     {
-        /** @var User $admin */
-        $admin = User::factory()->create();
+        $admin = User::find(13);
 
         $this->actingAs($admin, 'sanctum');
 
@@ -29,10 +26,10 @@ class CategoryManagementTest extends TestCase
     public function test_admin_can_delete_category()
     {
         /** @var User $admin */
-        $admin = User::factory()->create();
+        $admin = User::find(13);
         $this->actingAs($admin, 'sanctum');
 
-        $category = ComplaintCategory::factory()->create();
+        $category = ComplaintCategory::first();
 
         $response = $this->deleteJson("/api/admin/complaint/category/delete/{$category->id}");
         $response->assertStatus(200)
