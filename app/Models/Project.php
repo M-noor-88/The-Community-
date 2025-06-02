@@ -28,7 +28,7 @@ class Project extends Model
     protected $fillable = [
         'user_id', 'image_id', 'category_id', 'location_id',
         'number_of_participant', 'title', 'description', 'Execution_date',
-        'type', 'status', 'created_by', 'stripe_account_id',
+        'type', 'status', 'created_by',
     ];
 
     public function user(): BelongsTo

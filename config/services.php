@@ -37,6 +37,12 @@ return [
     'redirect_uri' => env('GOOGLE_REDIRECT_URI'),
 ],
 
+'stripe' => [
+    'secret' => env('STRIPE_SECRET'),
+    'public' => env('STRIPE_PUBLIC'),
+    'connect' => env('STRIPE_CONNECT'),
+],
+
 
 
 

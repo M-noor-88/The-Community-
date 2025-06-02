@@ -11,6 +11,7 @@ use App\Repositories\ImageRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\ProjectRepository;
 use App\Repositories\RecommendationRepository;
+use App\Services\DonationService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class ProjectService
         protected CampaignDonationSumRepository $campaignDonationSumRepo,
         protected CampaignParticipantRepository $campaignParticipantRepository,
         protected RecommendationRepository $recommendRepo,
+        protected DonationService $stripeService,
     ) {}
 
     public function show($projectId): array
@@ -40,7 +42,7 @@ class ProjectService
     /**
      * @throws Exception
      */
-    public function create(array $requestData): Project
+    public function  create(array $requestData): Project
     {
         try {
             DB::beginTransaction();
@@ -67,6 +69,7 @@ class ProjectService
                 $type = 'مبادرة';
                 $status = 'تصويت';
             }
+
 
             // Create project
             $attributes = [
@@ -160,7 +163,7 @@ class ProjectService
             'votes_count' => $project->votes?->count() ?? 0,
             'likes' => $project->totalVotes?->likes ?? 0,
             'dislikes' => $project->totalVotes?->dislikes ?? 0,
-            'donation_total' => $project->donationSummary?->total_amount ?? 0,
+            'donation_total' => $project->donationSummary?->total_donated ?? 0,
             'number_of_participants' => $project->number_of_participant,
             'joined_participants' => $project->participants?->count() ?? 0,
             'required_amount' => $project->donationSummary?->required_amount ?? 0,

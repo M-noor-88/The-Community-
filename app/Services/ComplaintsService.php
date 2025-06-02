@@ -68,7 +68,7 @@ class ComplaintsService
         $complaintImages = $request['complaintImages'] ?? [];
         $attachedImageIds = [];
         $title = $request['title'];
-        $region=$request['region'];
+        $area=$request['area'];
         $description = $request['description'];
         $categoryId=$request['complaint_category_id'];
         DB::beginTransaction();
@@ -77,7 +77,7 @@ class ComplaintsService
             $location_id = $this->locationRepo->create([
                 'latitude' => $request['latitude'],
                 'longitude' => $request['longitude'],
-                'region' => $request['region'] ?? 'غير معروف',
+                'area' => $request['area'] ?? 'غير معروف',
             ]);
 
             $user = Auth::user();
@@ -85,13 +85,13 @@ class ComplaintsService
                 throw new Exception('User not authenticated.');
             }
 
-            $points=$this->pointsService->calculate($title, $description, $region, $categoryId);
+            $points=$this->pointsService->calculate($title, $description, $area, $categoryId);
 
             $complaint = $this->complaintsRepo->create([
                 'user_id' => $user->id,
                 'complaint_category_id' => $categoryId,
                 'location_id' => $location_id,
-                'region' => $request['region'] ,
+                'area' => $request['area'] ,
                 'title' => $title,
                 'description' => $description ?? null,
                 'status' => 'انتظار',
