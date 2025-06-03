@@ -13,7 +13,7 @@ class LocationRepository
         return DB::table('locations')->insertGetId([
             'latitude' => $data['latitude'],
             'longitude' => $data['longitude'],
-            'name' => $data['region'] ?? 'غير معروف',
+            'name' => $data['area'] ?? 'غير معروف',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

@@ -7,16 +7,11 @@ use App\Models\User;
 use App\Models\Location;
 use App\Models\Image;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 class ComplaintFilterTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_can_filter_own_complaints()
     {
-        /** @var User $user */
-        $user = User::factory()->create();
+        $user = User::first();
         $this->actingAs($user, 'sanctum');
 
         $response = $this->postJson('/api/client/complaint/all', [
@@ -29,10 +24,9 @@ class ComplaintFilterTest extends TestCase
 
     public function test_nearby_complaints()
     {
-        /** @var User $user */
-        $user = User::factory()->create();
-        $image = Image::factory()->create();
-        $location = Location::factory()->create();
+        $user = User::first();
+        $image = Image::first();
+        $location = Location::first();
 
         $user->clientProfile()->create([
             'user_id' => $user->id,

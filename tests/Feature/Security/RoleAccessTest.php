@@ -2,32 +2,23 @@
 
 namespace Tests\Feature\Security;
 
-use App\Http\Middleware\RoleMiddleware;
 use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
+use App\Http\Middleware\RoleMiddleware;
 
 class RoleAccessTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-        // Create roles before running tests
-        Role::create(['name' => 'government_admin']);
-        Role::create(['name' => 'client']);
+
     }
 
     public function test_client_cannot_access_admin_route()
     {
-        /** @var User $user */
-        $user = User::factory()->create();
-        $user->assignRole('client');
-
-        // Acting as the user (optional here since you're mocking request manually)
-        $this->actingAs($user, 'sanctum');
+        $user = User::first();
 
         // Create the request
         $request = request()->create('/api/admin/complaint/all', 'POST');
@@ -38,7 +29,7 @@ class RoleAccessTest extends TestCase
         });
 
         // Create the middleware
-        $middleware = new \App\Http\Middleware\RoleMiddleware();
+        $middleware = new RoleMiddleware();
 
         // Pass the request through the middleware
         $response = $middleware->handle(

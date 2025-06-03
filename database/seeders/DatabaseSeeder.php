@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
             ComplaintSeeder::class,
             ComplaintImageSeeder::class,
             KeywordSeeder::class,
+            ProjectSeeder::class,
+            CampaignDonationsSeeder::class,
+
         ]);
     }
 }

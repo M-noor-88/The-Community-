@@ -8,6 +8,8 @@ use App\Http\Controllers\CampaignParticipantController;
 use App\Http\Controllers\GovernmentProjectController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ComplaintsController;
+use App\Http\Controllers\DonationController;
+
 
 use App\Http\Controllers\RatesController;
 use App\Http\Controllers\StatisticsController;
@@ -214,4 +216,18 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
     Route::post('campaigns/{id}/promote', [StatisticsController::class, 'promoteCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
     Route::post('campaigns/{id}/archive', [StatisticsController::class, 'archiveCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
 
+});
+
+Route::middleware('auth:sanctum')->prefix('Donation')->controller(DonationController::class)->group(function () {
+    Route::post('/donate',  'donate');
+
+});
+
+
+
+Route::prefix('Donation')
+    ->controller(DonationController::class)
+    ->group(function () {
+        Route::post('/stripe/webhook', 'handle');
+        Route::get('/monitoring', 'monitoring')->middleware('auth:sanctum')->middleware(['role:government_admin']);
 });

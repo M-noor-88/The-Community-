@@ -35,7 +35,6 @@ class ProjectFactory extends Factory
             'type' => 'مبادرة', // Must be 'مبادرة' for voting to work
             'status' => 'تصويت', // or whatever default makes sense
             'created_by' => "user",
-            'stripe_account_id' => Str::random(10),
         ];
     }
 }

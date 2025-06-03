@@ -24,7 +24,6 @@ return new class extends Migration
             $table->enum('type', ['حملة رسمية', 'مبادرة']);
             $table->enum('status', ['نشطة', 'منجزة' , 'تصويت' , 'ملغية'])->default('تصويت');
             $table->enum('created_by', ['user', 'volunteer']);
-            $table->string('stripe_account_id')->nullable();
             $table->timestamps();
         });
     }
