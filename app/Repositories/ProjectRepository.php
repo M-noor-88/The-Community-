@@ -16,6 +16,26 @@ class ProjectRepository
         return Project::create($data);
     }
 
+    public function getPromoted() : LengthAwarePaginator
+    {
+        return Project::where('is_promoted', true)
+            ->where('type' , 'حملة رسمية')->where('status' , 'نشطة')
+            ->orderByDesc('is_promoted')  // Promoted campaigns on top
+            ->orderByDesc('created_at')   // Then recent ones
+            ->with([
+                'user.clientProfile',
+                'image',
+                'category',
+                'location',
+                'votes',
+                'totalVotes',
+                'donations',
+                'donationSummary',
+                'participants',
+            ])
+            ->paginate(50);
+
+    }
     public function get($projectId): Project
     {
         return Project::with([

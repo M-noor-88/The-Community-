@@ -134,4 +134,32 @@ class StatisticsService
     {
         return $this->statisticsRepo->getNumberStatusProjects();
     }
+
+    public function getLowEngagementCampaignsWithActions(): array
+    {
+        $campaigns = $this->statisticsRepo->getLowEngagementCampaigns();
+
+        return $campaigns->map(function ($campaign) {
+            $suggestedAction = 'archive';
+
+            if ($campaign->participants_count > 0 || $campaign->donationSummary?->total_donors > 0) {
+                $suggestedAction = 'promote';
+            }
+
+            return [
+                'id' => $campaign->id,
+                'title' => $campaign->title,
+                'created_at' => $campaign->created_at->format('Y-m-d'),
+                'joined_participants' => $campaign->participants_count?? 0,
+                'total_donations' => $campaign->donationSummary?->total_donors ?? 0,
+                'suggested_action' => $suggestedAction,
+                'status' => $campaign->status,
+                'creator' => [
+                    'name' => $campaign->user->name ?? null,
+                    'email' => $campaign->user->email ?? null,
+                ],
+            ];
+        })->toArray();
+    }
+
 }

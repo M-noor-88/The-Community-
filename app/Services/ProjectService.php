@@ -150,7 +150,7 @@ class ProjectService
             'user' => [
                 'userID' => $project->user?->id,
                 'created_by' => $project->user?->name,
-                'role' => $project->user?->getRoleNames()[0],
+                'role' => $project->user?->getRoleNames()[0] ?? 'unknown',
                 'userImage' => $project->user->clientProfile->image->image_url ?? 'null',
             ],
             'image_url' => $project->image?->image_url,
@@ -250,6 +250,13 @@ class ProjectService
 
         $projects = $this->projectRepo->getRecommendations(Auth::id(), $status, $type);
 
+        return $projects->map(fn ($project) => $this->transformProject($project));
+    }
+
+    // Promoted
+    public function getPromoted()
+    {
+        $projects = $this->projectRepo->getPromoted();
         return $projects->map(fn ($project) => $this->transformProject($project));
     }
 }

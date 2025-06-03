@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use App\Services\StatisticsService;
 use Illuminate\Http\JsonResponse;
 
@@ -113,4 +114,55 @@ class StatisticsController extends Controller
             'data' => $this->statisticsService->getNumberStatusProjects(),
         ]);
     }
+
+    public function getLowEngagementCampaigns(): JsonResponse
+    {
+        $data = $this->statisticsService->getLowEngagementCampaignsWithActions();
+
+        return response()->json([
+            'status' => true,
+            'data' => $data,
+            'message' => 'Low engagement campaigns fetched successfully'
+        ]);
+    }
+
+
+    public function promoteCampaign(int $id): JsonResponse
+    {
+        try {
+            $campaign = Project::findOrFail($id);
+
+            $campaign->update([
+                'is_promoted' => true,
+                'is_archived' => false,
+            ]);
+            $campaign->save();
+
+            return response()->json(['message' => 'Campaign promoted successfully']);
+
+        }catch (\Exception $e)
+        {
+            return response()->json(['message' => 'Failed '. $e->getMessage()]);
+        }
+
+    }
+
+    public function archiveCampaign(int $id): JsonResponse
+    {
+        try {
+            $campaign = Project::findOrFail($id);
+
+            $campaign->update([
+                'is_archived' => true,
+                'is_promoted' => false,
+            ]);
+
+            return response()->json(['message' => 'Campaign archived successfully']);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json(['message' => 'Failed '. $e->getMessage()]);
+        }
+    }
+
 }

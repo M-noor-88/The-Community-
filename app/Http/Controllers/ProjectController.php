@@ -136,4 +136,16 @@ class ProjectController extends Controller
             return $this->error('Error Get recommendations '.$e->getMessage());
         }
     }
+
+    // Promoted projects
+    public function getPromoted() : JsonResponse
+    {
+        try {
+            $data = $this->projectService->getPromoted();
+            return $this->success($data);
+        }catch (Exception $e)
+        {
+            return $this->error("Failed :" . $e->getMessage());
+        }
+    }
 }

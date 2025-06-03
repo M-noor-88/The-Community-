@@ -72,4 +72,33 @@ class VolunteerProfileService
         ];
 
     }
+
+
+    /**
+     * @throws Exception
+     */
+    public function getAllProfiles(): array
+    {
+        if (! Auth::user()->hasRole('government_admin')) {
+            throw new Exception('ليس لديك الصلاحية ');
+        }
+        $profiles = $this->volunteerProfileRepo->all(); // Assuming this fetches all profiles
+
+        return $profiles->map(function ($profile) {
+            return [
+                'userID'=> $profile->user?->id,
+                'name' => $profile->user?->name,
+                'bio' => $profile->bio,
+                'experience_years' => $profile->experience_years,
+                'phone' => $profile->phone,
+                'location' => [
+                    'longitude' => $profile->location?->longitude,
+                    'latitude' => $profile->location?->latitude,
+                    'area' => $profile->location?->name,
+                ],
+                'image' => $profile->image->image_url ?? null,
+            ];
+        })->toArray();
+    }
+
 }
