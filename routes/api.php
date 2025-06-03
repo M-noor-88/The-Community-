@@ -68,6 +68,8 @@ Route::prefix('client/project')
 
         // Recommendations
         Route::post('/recommends' , 'recommendations')->middleware('auth:sanctum');
+        //promoted projects
+        Route::get('/promoted' , 'getPromoted');
     });
 
 
@@ -124,8 +126,11 @@ Route::prefix('volunteer')
 //Profile Volunteer
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/volunteer/profile/{userID}', [VolunteerProfileController::class, 'update']);
-    Route::delete('/volunteer/profile', [VolunteerProfileController::class, 'destroy']);
+    Route::delete('/volunteer/profile/{userID}', [VolunteerProfileController::class, 'destroy']);
     Route::get('/volunteer/show/profile' ,[VolunteerProfileController::class, 'showProfile']);
+
+    Route::get('/volunteer/profile/all' ,[VolunteerProfileController::class, 'getAllVolunteersProfiles']);
+
 });
 
 
@@ -203,5 +208,10 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
     Route::get('/monthly', [StatisticsController::class, 'getMonthlyStatistics']);
 
     Route::get('/status', [StatisticsController::class, 'getNumberProjectsStatus']);
+
+
+    Route::get('/low-engagement', [StatisticsController::class, 'getLowEngagementCampaigns']);
+    Route::post('campaigns/{id}/promote', [StatisticsController::class, 'promoteCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
+    Route::post('campaigns/{id}/archive', [StatisticsController::class, 'archiveCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
 
 });

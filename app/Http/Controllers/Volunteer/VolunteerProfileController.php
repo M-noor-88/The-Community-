@@ -39,6 +39,7 @@ class VolunteerProfileController extends Controller
         }
     }
 
+    // For Admin
     public function destroy($userID): JsonResponse
     {
         try {
@@ -60,4 +61,19 @@ class VolunteerProfileController extends Controller
             return $this->error('Failed to get Profile'.$e->getMessage());
         }
     }
-}
+
+
+    // For Admin
+
+    public function getAllVolunteersProfiles(): JsonResponse
+    {
+        try {
+            $data = $this->volunteerService->getAllProfiles();
+
+            return $this->success($data , 'success');
+        } catch(Exception $e)
+        {
+            return $this->error('Failed to get '.$e->getMessage());
+        }
+    }
+ }

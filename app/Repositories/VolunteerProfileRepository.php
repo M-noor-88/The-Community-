@@ -44,4 +44,10 @@ class VolunteerProfileRepository
     {
         return $user->volunteerProfile?->delete();
     }
+
+    public function all()
+    {
+        return VolunteerProfile::with(['user', 'location', 'image'])->get();
+    }
+
 }

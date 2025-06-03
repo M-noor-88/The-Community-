@@ -152,4 +152,17 @@ class StatisticsRepository
                 ];
             });
     }
+
+    public function getLowEngagementCampaigns()
+    {
+        return Project::where('type', 'حملة رسمية')
+            ->where('status' , 'نشطة')
+            ->where('is_archived', false)
+            ->with(['user', 'category', 'participants', 'donationSummary'])
+            ->withCount('participants')
+            ->where('created_at', '<=', now()->subDays(10))
+            ->get();
+
+    }
+
 }

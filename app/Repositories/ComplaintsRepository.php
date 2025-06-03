@@ -7,7 +7,6 @@ use App\Models\Complaint;
 use App\Models\ComplaintCategory;
 use App\Models\Location;
 use App\Models\User;
-use App\Enums\ComplaintStatus;
 use App\Models\Region;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
