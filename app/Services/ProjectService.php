@@ -11,6 +11,7 @@ use App\Repositories\ImageRepository;
 use App\Repositories\LocationRepository;
 use App\Repositories\ProjectRepository;
 use App\Repositories\RecommendationRepository;
+use App\Services\DonationService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,23 +25,24 @@ class ProjectService
         protected CampaignDonationSumRepository $campaignDonationSumRepo,
         protected CampaignParticipantRepository $campaignParticipantRepository,
         protected RecommendationRepository $recommendRepo,
+        protected DonationService $stripeService,
     ) {}
 
     public function show($projectId): array
     {
         $project = $this->projectRepo->get($projectId);
 
-        if(Auth::id())
-        {
-            $this->recommendRepo->updateInterests($project->category->id, Auth::id() , 1);
+        if (Auth::id()) {
+            $this->recommendRepo->updateInterests($project->category->id, Auth::id(), 1);
         }
+
         return $this->transformProject($project);
     }
 
     /**
      * @throws Exception
      */
-    public function create(array $requestData): Project
+    public function  create(array $requestData): Project
     {
         try {
             DB::beginTransaction();
@@ -68,6 +70,7 @@ class ProjectService
                 $status = 'تصويت';
             }
 
+
             // Create project
             $attributes = [
                 'user_id' => $user->id,
@@ -76,6 +79,7 @@ class ProjectService
                 'image_id' => $image->id,
                 'title' => $requestData['title'],
                 'description' => $requestData['description'] ?? null,
+                'Execution_date' => $requestData['execution_date'] ?? null,
                 'type' => $type,
                 'status' => $status,
                 'number_of_participant' => $requestData['number_of_participant'],
@@ -146,7 +150,8 @@ class ProjectService
             'user' => [
                 'userID' => $project->user?->id,
                 'created_by' => $project->user?->name,
-                'role' => $project->user?->getRoleNames()[0],
+                'role' => $project->user?->getRoleNames()[0] ?? 'unknown',
+                'userImage' => $project->user->clientProfile->image->image_url ?? 'null',
             ],
             'image_url' => $project->image?->image_url,
             'category' => $project->category?->name,
@@ -158,10 +163,11 @@ class ProjectService
             'votes_count' => $project->votes?->count() ?? 0,
             'likes' => $project->totalVotes?->likes ?? 0,
             'dislikes' => $project->totalVotes?->dislikes ?? 0,
-            'donation_total' => $project->donationSummary?->total_amount ?? 0,
+            'donation_total' => $project->donationSummary?->total_donated ?? 0,
             'number_of_participants' => $project->number_of_participant,
             'joined_participants' => $project->participants?->count() ?? 0,
             'required_amount' => $project->donationSummary?->required_amount ?? 0,
+            'created_at' => $project->created_at->format('d/m/Y'),
         ];
 
         if ($project->type === 'مبادرة') {
@@ -206,11 +212,19 @@ class ProjectService
     public function myProjects()
     {
         $userId = Auth::id();
-        $projects = Project::with(['category', 'location', 'image', 'ratings.user', 'user'])
-            ->where('user_id', $userId)
-            ->latest()
-            ->get();
 
+        $query = Project::with(['category', 'location', 'image', 'ratings.user', 'user'])
+            ->where('user_id', $userId);
+
+        $user = User::where('id' , $userId)->first();
+
+        if($user->hasRole('client'))
+        {
+            $projects = $query->where('type' , 'مبادرة')->latest()->get();
+            return  $projects->map(fn ($project) => $this->transformProject($project));
+        }
+
+        $projects = $query->where('type', 'حملة رسمية')->latest()->get();
         return $projects->map(fn ($project) => $this->transformProject($project));
     }
 
@@ -230,13 +244,19 @@ class ProjectService
         return $this->projectRepo->deleteIfInitiativeOwner($projectId, $userId);
     }
 
-
     // Recommendation | Can set Status
-    public function getRecommendation($status , $type)
+    public function getRecommendation($status, $type)
     {
 
-        $projects = $this->projectRepo->getRecommendations(Auth::id() , $status , $type);
+        $projects = $this->projectRepo->getRecommendations(Auth::id(), $status, $type);
 
+        return $projects->map(fn ($project) => $this->transformProject($project));
+    }
+
+    // Promoted
+    public function getPromoted()
+    {
+        $projects = $this->projectRepo->getPromoted();
         return $projects->map(fn ($project) => $this->transformProject($project));
     }
 }

@@ -16,10 +16,30 @@ class ProjectRepository
         return Project::create($data);
     }
 
+    public function getPromoted() : LengthAwarePaginator
+    {
+        return Project::where('is_promoted', true)
+            ->where('type' , 'حملة رسمية')->where('status' , 'نشطة')
+            ->orderByDesc('is_promoted')  // Promoted campaigns on top
+            ->orderByDesc('created_at')   // Then recent ones
+            ->with([
+                'user.clientProfile',
+                'image',
+                'category',
+                'location',
+                'votes',
+                'totalVotes',
+                'donations',
+                'donationSummary',
+                'participants',
+            ])
+            ->paginate(50);
+
+    }
     public function get($projectId): Project
     {
         return Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -34,7 +54,7 @@ class ProjectRepository
     public function getAllProjectsByType($type = null, $status = null): LengthAwarePaginator
     {
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -55,13 +75,13 @@ class ProjectRepository
             $query->where('status', $status);
         }
 
-        return $query->paginate(10);
+        return $query->paginate(5);
     }
 
     public function getProjectsByCategoryAndType($categoryId, $type = null): LengthAwarePaginator
     {
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -84,7 +104,7 @@ class ProjectRepository
         $distanceFormula = "(6371 * acos(cos(radians($latitude)) * cos(radians(locations.latitude)) * cos(radians(locations.longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(locations.latitude))))";
 
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -152,18 +172,16 @@ class ProjectRepository
         return $project->delete();
     }
 
-
     // Recommendation
-    public function getRecommendations($userID ,$status = null , $type = null): LengthAwarePaginator
+    public function getRecommendations($userID, $status = null, $type = null): LengthAwarePaginator
     {
         $topCategories = DB::table('user_interests')
             ->where('user_id', $userID)
             ->orderByDesc('interest_score')
             ->pluck('category_id');
 
-
         $query = Project::with([
-            'user',
+            'user.clientProfile',
             'image',
             'category',
             'location',
@@ -174,20 +192,15 @@ class ProjectRepository
             'participants',
         ])->whereIn('category_id', $topCategories);
 
-        if($status != null)
-        {
+        if ($status != null) {
             $query->where('status', $status);
         }
 
-        if($type != null)
-        {
+        if ($type != null) {
             $query->where('type', $type);
         }
 
-
-
         return $query->paginate(10);
-
 
     }
 }

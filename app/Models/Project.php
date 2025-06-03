@@ -28,7 +28,7 @@ class Project extends Model
     protected $fillable = [
         'user_id', 'image_id', 'category_id', 'location_id',
         'number_of_participant', 'title', 'description', 'Execution_date',
-        'type', 'status', 'created_by', 'stripe_account_id',
+        'type', 'status', 'created_by' , 'is_promoted' , 'is_archived',
     ];
 
     public function user(): BelongsTo
@@ -73,7 +73,7 @@ class Project extends Model
 
     public function participants(): HasMany
     {
-        return $this->hasMany(CampaignParticipant::class);
+        return $this->hasMany(CampaignParticipant::class)->where('status', 'تمت الموافقة');
     }
 
     public function ratings(): HasMany

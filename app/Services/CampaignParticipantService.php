@@ -49,7 +49,7 @@ class CampaignParticipantService
                     $projectId, $userID, 'انتظار');
         }
 
-        $this->recommendRepo->updateInterests($project->category->id , $userID , 3);
+        $this->recommendRepo->updateInterests($project->category->id, $userID, 3);
 
         return $data;
     }

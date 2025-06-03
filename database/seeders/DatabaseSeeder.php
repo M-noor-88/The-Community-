@@ -19,8 +19,14 @@ class DatabaseSeeder extends Seeder
             VolunteerFieldSeeder::class,
             LocationAndImageSeeder::class,
             RolesAndUsersSeeder::class,
-            ComplaintsSeeder::class,
-            ProjectsCategorySeeder::class
+            ComplaintsCategorySeeder::class,
+            ProjectsCategorySeeder::class,
+            ComplaintSeeder::class,
+            ComplaintImageSeeder::class,
+            KeywordSeeder::class,
+            ProjectSeeder::class,
+            CampaignDonationsSeeder::class,
+
         ]);
     }
 }

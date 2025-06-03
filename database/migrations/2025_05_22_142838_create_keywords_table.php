@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('achievement_images', function (Blueprint $table) {
+        Schema::create('keywords', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('complaint_id')->constrained()->onDelete('cascade');
-            $table->foreignId('image_id')->constrained('images')->onDelete('cascade');
+            $table->string('word');
+            $table->unsignedTinyInteger('points');
             $table->timestamps();
         });
-
     }
 
     /**
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('achievement_images');
+        Schema::dropIfExists('keywords');
     }
 };

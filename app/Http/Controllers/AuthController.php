@@ -12,9 +12,6 @@ use App\Traits\JsonResponseTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-
-
 
 class AuthController extends Controller
 {
@@ -26,7 +23,6 @@ class AuthController extends Controller
     {
         $this->authService = $authService;
     }
-
 
     public function initiate_registration(RegisterRequest $request): JsonResponse
     {
@@ -43,6 +39,7 @@ class AuthController extends Controller
     {
         try {
             $data = $this->authService->register($request);
+
             return $this->success($data, 'Registered successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());

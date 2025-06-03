@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Image extends Model
 {
+    use HasFactory;
+
     protected $table = 'images';
 
     protected $fillable = ['image_url'];
@@ -20,6 +23,4 @@ class Image extends Model
     {
         return $this->belongsToMany(Complaint::class, 'achievement_images');
     }
-
-
 }

@@ -77,7 +77,15 @@ class AuthRepository
         if (! Auth::attempt($credentials)) {
             throw new Exception('Invalid credentials');
         }
+
         $user = User::where('id', Auth::id())->first();
+
+        if ($request['device_token']) {
+            $user->update([
+                'device_token' => $request['device_token'],
+            ]);
+            $user->save();
+        }
         $token = $user->createToken('auth_token')->plainTextToken;
         $role = $user->getRoleNames()->first();
 

@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Http\Requests\RegisterRequest;
+use App\Jobs\SendResetPasswordEmailJob;
+use App\Jobs\SendVerificationEmailJob;
 use App\Repositories\AuthRepository;
 use App\Repositories\ClientProfileRepository;
 use App\Repositories\ImageRepository;
@@ -49,24 +51,24 @@ class AuthService
         $register_Data['skills'] = $request->skills;
         $register_Data['volunteer_fields'] = $request->volunteer_fields;
 
-
         //  Handle the image properly
         if ($request->hasFile('image')) {
             $image = $this->imageRepo->createPlaceholder();
             $this->imageRepo->storeTempImageAndDispatch($request['image'], $image->id);
 
             $register_Data['image_id'] = $image->id; // Save only the image ID
-        }else{
+        } else {
             $image = $this->imageRepo->createPlaceholder();
             $register_Data['image_id'] = $image->id; // Save only the image ID
         }
 
         $this->authRepository->initiateRegistration($register_Data);
-        $this->mailService->sendVerificationEmail([
+
+        SendVerificationEmailJob::dispatch([
             'verification_code' => $register_Data['verification_code'],
             'verification_expires_at' => $register_Data['verification_expires_at'],
             'email' => $register_Data['email'],
-        ]);
+        ])->delay(now()->addSeconds(5)); // Delayed by 2 minutes
 
     }
 
@@ -135,11 +137,11 @@ class AuthService
 
         $this->authRepository->initiateRegistration($data);
 
-        $this->mailService->sendVerificationEmail([
+        SendVerificationEmailJob::dispatch([
             'verification_code' => $data['verification_code'],
             'verification_expires_at' => $data['verification_expires_at'],
             'email' => $email,
-        ]);
+        ])->delay(now()->addSeconds(5)); // Delayed by 2 minutes
 
     }
 
@@ -154,6 +156,12 @@ class AuthService
         $data['email'] = $request['email'];
 
         $this->authRepository->cacheResetCode($data);
+
+        SendResetPasswordEmailJob::dispatch([
+            'reset_code' => $reset_code,
+            'reset_expires_at' => $reset_expires_at,
+            'email' => $request->email,
+        ])->delay(now()->addSeconds(3));
 
         $this->mailService->sendResetPasswordEmail([
             'reset_code' => $reset_code,

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class VolunteerProfile extends Model
 {
@@ -23,8 +22,8 @@ class VolunteerProfile extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function image(): HasOne
+    public function image(): BelongsTo
     {
-        return $this->hasOne(Image::class);
+        return $this->belongsTo(Image::class);
     }
 }

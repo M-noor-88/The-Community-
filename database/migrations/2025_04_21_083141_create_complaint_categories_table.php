@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('complaint_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->unsignedInteger('points')->default(5);
             $table->timestamps();
         });
     }

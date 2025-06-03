@@ -15,7 +15,7 @@ class RatingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'ratingID' => $this->id,
             'rating' => $this->rating,
             'comment' => $this->comment ?? 'لم يعلق',
             'user' => $this->user->name,

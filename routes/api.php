@@ -1,14 +1,19 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\VotesController;
 use App\Http\Controllers\CampaignParticipantController;
 use App\Http\Controllers\GovernmentProjectController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ComplaintsController;
+use App\Http\Controllers\DonationController;
+
 
 use App\Http\Controllers\RatesController;
+use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\Volunteer\VolunteerProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -65,6 +70,8 @@ Route::prefix('client/project')
 
         // Recommendations
         Route::post('/recommends' , 'recommendations')->middleware('auth:sanctum');
+        //promoted projects
+        Route::get('/promoted' , 'getPromoted');
     });
 
 
@@ -95,16 +102,15 @@ Route::middleware('auth:sanctum')->post('/ratings', [RatesController::class,'add
     // Project Creation and Handling
 Route::prefix('client/complaint')
 ->middleware(['role:client'])
+->middleware('auth:sanctum')
 ->controller(ComplaintsController::class)
 ->group(function () {
-    Route::post('/create', 'store')->middleware('auth:sanctum');
+    Route::post('/create', 'store');
+    Route::post('/all' , 'filterComplaintsClient');
+    Route::get('/ByID/{id}' , 'complaintsByID');    //get complaints by id
+    Route::get('/category/all', 'getAllCategories');
+    Route::post('/update/{id}', 'update');
 
-    Route::get('/all' , 'index')->middleware('auth:sanctum');   ///get all complaints
-    Route::get('/ByCategory/{category_id}' , 'complaintsByCategory')->middleware('auth:sanctum');   //get complaints by category
-    Route::get('/ByStatus/{status?}' , 'complaintsByStatus')->middleware('auth:sanctum');   //get complaints by status
-    Route::post('/ByStatusAndCategory' , 'complaintsByCatAndSt')->middleware('auth:sanctum');   //get complaints by status and category
-    Route::get('/ByID/{id}' , 'complaintsByID')->middleware('auth:sanctum');    //get complaints by id
-    Route::get('/category' , 'complaintCategories')->middleware('auth:sanctum');    //get all categories for complaints
 });
 
 
@@ -118,6 +124,16 @@ Route::prefix('volunteer')
         Route::post('login', 'login');
         Route::post('logout', 'logout')->middleware('auth:sanctum');
     });
+
+//Profile Volunteer
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/volunteer/profile/{userID}', [VolunteerProfileController::class, 'update']);
+    Route::delete('/volunteer/profile/{userID}', [VolunteerProfileController::class, 'destroy']);
+    Route::get('/volunteer/show/profile' ,[VolunteerProfileController::class, 'showProfile']);
+
+    Route::get('/volunteer/profile/all' ,[VolunteerProfileController::class, 'getAllVolunteersProfiles']);
+
+});
 
 
 Route::middleware(['auth:sanctum'])->prefix('project')->controller(CampaignParticipantController::class)
@@ -136,19 +152,17 @@ Route::prefix('admin/complaint')
 ->controller(ComplaintsController::class)
 ->group(function () {
 
-    Route::get('/all' , 'index');
-    Route::get('/ByCategory/{category_id}' , 'complaintsByCategory');
-    Route::get('/ByStatus/{status?}' , 'complaintsByStatus');
-    Route::post('/ByStatusAndCategory' , 'complaintsByCatAndSt');
+    Route::post('/all' , 'filterComplaintsAdmin');
+
     Route::get('/ByID/{id}' , 'complaintsByID');
-    Route::get('/category' , 'complaintCategories');
 
     Route::post('/{id}/updateStatus', 'updateStatus');
     Route::get('/formalbook/{id}', 'getFormalBook');
     Route::get('/download/formalbook/{id}', 'downloadFormalBook');
 
     /////category
-    Route::post('/category/create', 'createCategory');
+    Route::get('/category/all', 'getAllCategories');
+    Route::post('/category/create', 'createCategory')->name('createCategory');
     Route::post('/category/update/{id}', 'updateCategory');
     Route::delete('/category/delete/{id}', 'deleteCategory');
 });
@@ -172,3 +186,48 @@ Route::middleware('auth:sanctum')
     Route::post('/{projectId}/promote',  'promote');
 });
 
+
+Route::prefix('categories')->group(function () {
+    Route::post('/', [CategoryController::class, 'store'])->middleware('auth:sanctum');
+    Route::get('/', [CategoryController::class, 'index']);
+    Route::delete('/{id}', [CategoryController::class, 'destroy']);
+});
+
+Route::prefix('statistics')->controller(StatisticsController::class)->group(function () {
+    Route::get('basic-counts',  'basicCounts');
+    Route::get('top-rated-projects', 'topRatedProjects');
+    Route::get('most-participated-projects', 'mostParticipatedProjects');
+    Route::get('projects-by-category',  'projectsByCategory');
+    Route::get('votes-summary', 'votesSummary');
+
+    Route::get('user-role-distribution', 'userRoleDistribution');
+    Route::get('weekly-participation',  'weeklyParticipation');
+
+    Route::get('/official-campaigns', [StatisticsController::class, 'getOfficialCampaigns']);
+    Route::get('/initiatives', [StatisticsController::class, 'getInitiatives']);
+    Route::get('/complaints', [StatisticsController::class, 'getComplaintStats']);
+
+    Route::get('/monthly', [StatisticsController::class, 'getMonthlyStatistics']);
+
+    Route::get('/status', [StatisticsController::class, 'getNumberProjectsStatus']);
+
+
+    Route::get('/low-engagement', [StatisticsController::class, 'getLowEngagementCampaigns']);
+    Route::post('campaigns/{id}/promote', [StatisticsController::class, 'promoteCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
+    Route::post('campaigns/{id}/archive', [StatisticsController::class, 'archiveCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
+
+});
+
+Route::middleware('auth:sanctum')->prefix('Donation')->controller(DonationController::class)->group(function () {
+    Route::post('/donate',  'donate');
+
+});
+
+
+
+Route::prefix('Donation')
+    ->controller(DonationController::class)
+    ->group(function () {
+        Route::post('/stripe/webhook', 'handle');
+        Route::get('/monitoring', 'monitoring')->middleware('auth:sanctum')->middleware(['role:government_admin']);
+});
