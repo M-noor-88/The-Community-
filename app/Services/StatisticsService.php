@@ -146,6 +146,7 @@ class StatisticsService
                 ],
             ];
         })->toArray();
+    }
     // Complaints
     public function getComplaintStatistics(): array
     {
