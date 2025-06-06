@@ -9,10 +9,10 @@ use App\Http\Requests\UpdateComplaintRequest;
 use App\Services\ComplaintsService;
 use App\Services\PdfGeneratorService;
 use App\Traits\JsonResponseTrait;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Http\Request;
+use Exception;
 
 class ComplaintsController extends Controller
 {

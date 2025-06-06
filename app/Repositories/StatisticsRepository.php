@@ -41,7 +41,8 @@ class StatisticsRepository
                 'totalVotes',
                 'donations',
                 'donationSummary',
-                'participants', ])
+                'participants',
+            ])
             ->withAvg('ratings', 'rating')
             ->orderByDesc('ratings_avg_rating')
             ->take($limit)
@@ -60,7 +61,8 @@ class StatisticsRepository
                 'totalVotes',
                 'donations',
                 'donationSummary',
-                'participants', ])
+                'participants',
+            ])
             ->withCount('participants')
             ->orderByDesc('participants_count')
             ->take($limit)
@@ -151,5 +153,121 @@ class StatisticsRepository
                     'Canceled' => (int) $raw->Canceled,
                 ];
             });
+    }
+
+    ////////////////////complaints/////////////////////
+    public function getComplaintByStatus()
+    {
+
+        return Complaint::select('status', DB::raw('COUNT(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+    }
+
+    public function PendingTime()
+    {
+        return  Complaint::where('status', 'انتظار')
+            ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, NOW())) as avg_hours')
+            ->value('avg_hours');
+    }
+
+    public function InProgressTime()
+    {
+        return Complaint::where('status', 'يتم التنفيذ')
+            ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, NOW())) as avg_hours')
+            ->value('avg_hours');
+    }
+
+    public function getTotalComplaints()
+    {
+        return Complaint::count();
+    }
+
+    public function getComplaintsByCategory()
+    {
+        return Complaint::select('complaint_category_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('complaint_category_id')
+            ->with('category:id,name')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category' => $item->category->name ?? 'Unknown',
+                    'count' => $item->count,
+                ];
+            });
+    }
+
+    public function getMostPayment()
+    {
+        return  CampaignDonation::where('status', 'مدفوع')
+            ->orderByDesc('amount')
+            ->first(['amount', 'user_id', 'project_id']);
+    }
+
+    public function getTotalPayment()
+    {
+        return CampaignDonation::where('status', 'مدفوع')->sum('amount');
+    }
+
+    public function getTopCampaigns()
+    {
+        return  DB::table('campaign_donation_summaries')
+            ->join('projects', 'campaign_donation_summaries.project_id', '=', 'projects.id')
+            ->where('projects.type', 'حملة رسمية')
+            ->orderByDesc('total_donated')
+            ->take(5)
+            ->get(['projects.title', 'total_donated', 'required_amount']);
+    }
+
+    public function getDonationTrendsByTime(): array
+    {
+        // Hourly trends (0–23)
+        $hourly = CampaignDonation::where('status', 'مدفوع')
+            ->selectRaw('HOUR(donated_at) as hour, SUM(amount) as total')
+            ->groupBy('hour')
+            ->orderBy('hour')
+            ->get();
+
+        // Daily trends (Y-m-d)
+        $daily = CampaignDonation::where('status', 'مدفوع')
+            ->selectRaw('DATE(donated_at) as date, SUM(amount) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Weekly trends (e.g., Monday, Tuesday)
+        $weekly = CampaignDonation::where('status', 'مدفوع')
+            ->selectRaw('DAYNAME(donated_at) as day_name, SUM(amount) as total')
+            ->groupBy('day_name')
+            ->orderByRaw("FIELD(day_name, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')")
+            ->get();
+
+        return [
+            'hourly' => $hourly,
+            'daily' => $daily,
+            'weekly' => $weekly,
+        ];
+    }
+
+    public function getAveragePoints()
+    {
+        return Complaint::avg('priority_points');
+    }
+
+    public function getScoreDistribution()
+    {
+        $scoreDistribution = [
+            'low' => Complaint::where('priority_points', '<', 10)->count(),
+            'medium' => Complaint::whereBetween('priority_points', [10, 15])->count(),
+            'high' => Complaint::where('priority_points', '>', 15)->count(),
+        ];
+
+        return $scoreDistribution;
+    }
+
+    public function getMostHighComplaint()
+    {
+        return Complaint::orderByDesc('priority_points')
+            ->first(['id', 'title', 'priority_points', 'region', 'status']);
     }
 }

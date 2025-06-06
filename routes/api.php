@@ -97,7 +97,6 @@ Route::middleware('auth:sanctum')->post('/ratings', [RatesController::class,'add
 
 //------------------------------- complaint -------------------------------
 
-    // Project Creation and Handling
 Route::prefix('client/complaint')
 ->middleware(['role:client'])
 ->middleware('auth:sanctum')
@@ -206,11 +205,21 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
 
     Route::get('/status', [StatisticsController::class, 'getNumberProjectsStatus']);
 
+
+    Route::get('/complaints', 'getComplaintStatistics');
+    Route::get('/payment ', 'getPaymentStatistics');
+    Route::get('/pointSystem ', 'getPointSystemStatistics');
+
+
+
+
 });
 
-Route::middleware('auth:sanctum')->prefix('Donation')->controller(DonationController::class)->group(function () {
+Route::middleware(['role:client'])
+->middleware('auth:sanctum')
+->prefix('Donation')->controller(DonationController::class)
+->group(function () {
     Route::post('/donate',  'donate');
-
 });
 
 
