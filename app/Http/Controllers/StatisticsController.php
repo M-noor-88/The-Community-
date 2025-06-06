@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Services\StatisticsService;
 use Illuminate\Http\JsonResponse;
+use App\Repositories\StatisticsRepository;
+use App\Traits\JsonResponseTrait;
+use Exception;
 
 class StatisticsController extends Controller
 {
-    public function __construct(protected StatisticsService $statisticsService) {}
+    use JsonResponseTrait;
+    public function __construct(protected StatisticsService $statisticsService,protected StatisticsRepository $statistics_repository) {}
 
     public function weeklyParticipation(): JsonResponse
     {
@@ -46,15 +50,15 @@ class StatisticsController extends Controller
         return $this->makeResponse('Votes summary fetched successfully', $this->statisticsService->getVotesSummary());
     }
 
-    public function projectsByLocation(): JsonResponse
-    {
-        return $this->makeResponse('Projects by location fetched successfully', $this->statisticsService->getProjectsByLocation());
-    }
+    // public function projectsByLocation(): JsonResponse
+    // {
+    //     return $this->makeResponse('Projects by location fetched successfully', $this->statisticsService->getProjectsByLocation());
+    // }
 
-    public function complaintsByLocation(): JsonResponse
-    {
-        return $this->makeResponse('Complaints by location fetched successfully', $this->statisticsService->getComplaintsByLocation());
-    }
+    // public function complaintsByLocation(): JsonResponse
+    // {
+    //     return $this->makeResponse('Complaints by location fetched successfully', $this->statisticsService->getComplaintsByLocation());
+    // }
 
     public function userRoleDistribution(): JsonResponse
     {
@@ -165,4 +169,40 @@ class StatisticsController extends Controller
         }
     }
 
+
+
+    ////////////////complaints/////////////////////
+
+    public function getComplaintStatistics()
+    {
+
+        try {
+            $complaintsStatistics = $this->statisticsService->getComplaintStatistics();
+
+            return $this->success($complaintsStatistics, 'Categories retrieved successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+
+    }
+
+    public function getPaymentStatistics()
+    {
+        try {
+            $paymentStatistics = $this->statisticsService->getPaymentStatistics();
+            return $this->success($paymentStatistics, 'Categories retrieved successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function getPointSystemStatistics()
+    {
+        try {
+            $pointSystemStatistics = $this->statisticsService->getPointSystemStatistics();
+            return $this->success($pointSystemStatistics, 'Categories retrieved successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
 }
