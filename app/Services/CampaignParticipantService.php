@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Jobs\SendUserNotificationJob;
+use App\Models\User;
 use App\Repositories\CampaignParticipantRepository;
 use App\Repositories\ProjectRepository;
 use App\Repositories\RecommendationRepository;
@@ -38,18 +40,55 @@ class CampaignParticipantService
         $userID = Auth::id();
         $data = null;
 
+        $status = null;
         //        اذا كان مستخدم عادي اللي عمل انشاء للمشروع ثم اصبح حملة رسمية , المستخدمين بتقدر تنضم مباشرة
         if ($ownerRole == 'client') {
             $data = $this->joinCampaignPartRepository
                 ->createJoinParticipantWithStatus(
                     $projectId, $userID, 'تمت الموافقة');
+            $status = 'تمت الموافقة';
         } elseif ($ownerRole == 'volunteer_admin') {
             $data = $this->joinCampaignPartRepository
                 ->createJoinParticipantWithStatus(
                     $projectId, $userID, 'انتظار');
+            $status = 'انتظار';
         }
 
         $this->recommendRepo->updateInterests($project->category->id, $userID, 3);
+
+
+        //  Dispatch Notification Job
+        $user = User::findOrFail($userID);
+        if ($user->device_token) {
+            $title = 'انضمام للحملة';
+            $body = $status === 'تمت الموافقة'
+                ? "لقد انضممت بنجاح إلى الحملة: {$project->title}"
+                : "تم إرسال طلب الانضمام للحملة: {$project->title}، بانتظار الموافقة";
+
+            SendUserNotificationJob::dispatch(
+                $user->id,
+                $user->device_token,
+                $title,
+                $body
+            );
+        }
+
+
+        // Notify the owner (volunteer_admin) when a request is waiting
+        if ($status === 'انتظار' && $project->user && $project->user->device_token) {
+            $owner = $project->user;
+            $applicant = Auth::user();
+
+            $title = 'طلب انضمام جديد للحملة';
+            $body = "{$applicant->name} طلب الانضمام إلى الحملة: {$project->title}";
+
+            SendUserNotificationJob::dispatch(
+                $owner->id,
+                $owner->device_token,
+                $title,
+                $body
+            );
+        }
 
         return $data;
     }

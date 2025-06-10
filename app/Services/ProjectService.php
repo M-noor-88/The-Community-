@@ -167,7 +167,7 @@ class ProjectService
             'number_of_participants' => $project->number_of_participant,
             'joined_participants' => $project->participants?->count() ?? 0,
             'required_amount' => $project->donationSummary?->required_amount ?? 0,
-            'created_at' => $project->created_at->format('d/m/Y'),
+            'created_at' => $project->created_at?->format('d/m/Y'),
         ];
 
         if ($project->type === 'مبادرة') {

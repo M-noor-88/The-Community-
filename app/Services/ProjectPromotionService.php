@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendUserNotificationJob;
 use App\Models\User;
 use App\Repositories\ProjectRepository;
 use Exception;
@@ -31,6 +32,17 @@ class ProjectPromotionService
             'execution_date' => $executionDate,
             'status' => $status,
         ]);
+
+        $owner = $project->user;
+
+        if ($owner && $owner->device_token) {
+            SendUserNotificationJob::dispatch(
+                $owner->id,
+                $owner->device_token,
+                'تحديث حالة المشروع',
+                "تمت تحديث  مشروعك '{$project->title}' إلى حملة {$status} ",
+            );
+        }
 
         return [
             'id' => $data['id'],

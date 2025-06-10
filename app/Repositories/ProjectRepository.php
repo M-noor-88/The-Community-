@@ -75,7 +75,7 @@ class ProjectRepository
             $query->where('status', $status);
         }
 
-        return $query->paginate(5);
+        return $query->paginate(50);
     }
 
     public function getProjectsByCategoryAndType($categoryId, $type = null): LengthAwarePaginator
@@ -96,7 +96,7 @@ class ProjectRepository
             $query->where('type', $type);
         }
 
-        return $query->paginate(10);
+        return $query->paginate(50);
     }
 
     public function getNearbyProjects($latitude, $longitude, $distanceKm = 10, $type = null, $categoryId = null): LengthAwarePaginator
@@ -126,7 +126,7 @@ class ProjectRepository
             $query->where('projects.category_id', $categoryId);
         }
 
-        return $query->paginate(10);
+        return $query->paginate(50);
     }
 
     //  Get initiatives sorted by votes desc
@@ -200,7 +200,7 @@ class ProjectRepository
             $query->where('type', $type);
         }
 
-        return $query->paginate(10);
+        return $query->paginate(50);
 
     }
 }
