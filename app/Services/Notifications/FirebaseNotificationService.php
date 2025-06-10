@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Services\Notifications;
+
+
+use Exception;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;

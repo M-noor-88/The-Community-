@@ -2,8 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Jobs\SendUserNotificationJob;
 use App\Models\CampaignParticipant;
 use App\Models\Project;
+use App\Models\User;
 use Exception;
 
 class CampaignParticipantRepository
@@ -53,6 +55,24 @@ class CampaignParticipantRepository
 
         $participant->status = $status;
         $participant->save();
+
+        // ✅ Notify the user who applied
+        $user = User::find($participant->user_id);
+        $project = $participant->project;
+
+        if ($user && $user->device_token) {
+            $title = 'تحديث على طلب انضمامك للحملة';
+            $body = $status === 'تمت الموافقة'
+                ? "تمت الموافقة على طلب انضمامك إلى الحملة: {$project->title}"
+                : "تم رفض طلب انضمامك إلى الحملة: {$project->title}";
+
+            SendUserNotificationJob::dispatch(
+                $user->id,
+                $user->device_token,
+                $title,
+                $body
+            );
+        }
 
         return $participant;
     }

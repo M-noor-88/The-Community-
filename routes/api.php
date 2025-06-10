@@ -6,6 +6,7 @@ use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\VotesController;
 use App\Http\Controllers\CampaignParticipantController;
 use App\Http\Controllers\GovernmentProjectController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ComplaintsController;
 use App\Http\Controllers\DonationController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\RatesController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\Volunteer\VolunteerProfileController;
+use App\Services\Notifications\FirebaseNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -231,3 +233,6 @@ Route::prefix('Donation')
         Route::post('/stripe/webhook', 'handle');
         Route::get('/monitoring', 'monitoring')->middleware('auth:sanctum')->middleware(['role:government_admin']);
 });
+
+// Notifications
+Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
