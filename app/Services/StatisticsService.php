@@ -111,20 +111,6 @@ class StatisticsService
             })->toArray();
     }
 
-    // Complaints
-    public function getComplaintStatistics(): array
-    {
-        return $this->statisticsRepo->getComplaintsWithLocationAndCategory()
-            ->map(function ($complaint) {
-                return [
-                    'title' => $complaint->title,
-                    'category' => $complaint->category?->name,
-                    'latitude' => $complaint->location?->latitude,
-                    'longitude' => $complaint->location?->longitude,
-                ];
-            })->toArray();
-    }
-
     public function getMonthlyStatistics(): array
     {
         return $this->statisticsRepo->getMonthlyCounts()->toArray();
@@ -160,6 +146,86 @@ class StatisticsService
                 ],
             ];
         })->toArray();
+    }
+    // Complaints
+    public function getComplaintStatistics(): array
+    {
+
+        // 1. Complaints by Status
+        $statusCounts = $this->statisticsRepo->getComplaintByStatus();
+
+
+        // 2. Time to Resolve (only for 'انتظار' and 'يتم التنفيذ')
+        $pendingTime = $this->statisticsRepo->PendingTime();
+
+
+        $inProgressTime = $this->statisticsRepo->InProgressTime();
+
+
+        // 3. Total Complaints
+        $totalComplaints = $this->statisticsRepo->getTotalComplaints();
+
+        // 4. Complaints by Category
+        $categoryCounts = $this->statisticsRepo->getComplaintsByCategory();
+
+
+        return [
+            'status_counts' => $statusCounts,
+            'avg_resolution_time_hours' => [
+                'pending' => round($pendingTime ?? 0, 1),
+                'in_progress' => round($inProgressTime ?? 0, 1),
+            ],
+            'total_complaints' => $totalComplaints,
+            'complaints_by_category' => $categoryCounts,
+        ];
+    }
+
+    public function getPaymentStatistics(): array
+    {
+        // 1. Most Payment (Highest single successful donation)
+        $mostPayment = $this->statisticsRepo->getMostPayment();
+
+
+        // 2. Total Payment (sum of all successful donations)
+        $totalPayment = $this->statisticsRepo->getTotalPayment();
+
+        // 3. Top 5 Campaigns by Total Donations
+        $topCampaigns = $this->statisticsRepo->getTopCampaigns();
+
+
+        // 4. Donation Trends (daily totals)
+        $donationTrends = $this->statisticsRepo->getDonationTrendsByTime();
+
+
+        return [
+            'most_payment' => $mostPayment,
+            'total_payment' => round($totalPayment, 2),
+            'top_campaigns' => $topCampaigns,
+            'donation_trends' => [
+                    'hourly' => $donationTrends['hourly'],
+                    'daily' => $donationTrends['daily'],
+                    'weekly' => $donationTrends['weekly'],
+                ],        ];
+    }
+
+    public function getPointSystemStatistics(): array
+    {
+        // 1. Average points
+        $avgPoints = $this->statisticsRepo->getAveragePoints();
+
+
+        // 2. Score distribution
+        $scoreDistribution = $this->statisticsRepo->getScoreDistribution();
+
+        // 3. Highest priority complaint
+        $mostHighComplaint = $this->statisticsRepo->getMostHighComplaint();
+
+
+        return [
+            'average_points' => round($avgPoints, 2),
+            'score_distribution' => $scoreDistribution,
+            'most_high_complaint' => $mostHighComplaint,
+        ];
     }
 
 }

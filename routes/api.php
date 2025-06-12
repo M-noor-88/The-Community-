@@ -6,6 +6,7 @@ use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\VotesController;
 use App\Http\Controllers\CampaignParticipantController;
 use App\Http\Controllers\GovernmentProjectController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ComplaintsController;
 use App\Http\Controllers\DonationController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\RatesController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\Volunteer\VolunteerProfileController;
+use App\Services\Notifications\FirebaseNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -99,7 +101,6 @@ Route::middleware('auth:sanctum')->post('/ratings', [RatesController::class,'add
 
 //------------------------------- complaint -------------------------------
 
-    // Project Creation and Handling
 Route::prefix('client/complaint')
 ->middleware(['role:client'])
 ->middleware('auth:sanctum')
@@ -110,6 +111,7 @@ Route::prefix('client/complaint')
     Route::get('/ByID/{id}' , 'complaintsByID');    //get complaints by id
     Route::get('/category/all', 'getAllCategories');
     Route::post('/update/{id}', 'update');
+    Route::get('allRegions', 'getAllRegions');
 
 });
 
@@ -215,12 +217,20 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
     Route::get('/low-engagement', [StatisticsController::class, 'getLowEngagementCampaigns']);
     Route::post('campaigns/{id}/promote', [StatisticsController::class, 'promoteCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
     Route::post('campaigns/{id}/archive', [StatisticsController::class, 'archiveCampaign'])->middleware('auth:sanctum')->middleware(['role:government_admin']);
+    Route::get('/complaints', 'getComplaintStatistics');
+    Route::get('/payment ', 'getPaymentStatistics');
+    Route::get('/pointSystem ', 'getPointSystemStatistics');
+
+
+
 
 });
 
-Route::middleware('auth:sanctum')->prefix('Donation')->controller(DonationController::class)->group(function () {
+Route::middleware(['role:client'])
+->middleware('auth:sanctum')
+->prefix('Donation')->controller(DonationController::class)
+->group(function () {
     Route::post('/donate',  'donate');
-
 });
 
 
@@ -231,3 +241,6 @@ Route::prefix('Donation')
         Route::post('/stripe/webhook', 'handle');
         Route::get('/monitoring', 'monitoring')->middleware('auth:sanctum')->middleware(['role:government_admin']);
 });
+
+// Notifications
+Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);

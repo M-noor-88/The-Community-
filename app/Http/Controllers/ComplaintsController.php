@@ -9,10 +9,10 @@ use App\Http\Requests\UpdateComplaintRequest;
 use App\Services\ComplaintsService;
 use App\Services\PdfGeneratorService;
 use App\Traits\JsonResponseTrait;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Http\Request;
+use Exception;
 
 class ComplaintsController extends Controller
 {
@@ -157,6 +157,16 @@ class ComplaintsController extends Controller
         try {
             $complaints = $this->complaintsService->updateComplaint($id, $request->all());
             return $this->success($complaints, 'Complaint updated successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function getAllRegions(): JsonResponse
+    {
+        try {
+            $regions = $this->complaintsService->getAllRegions();
+            return $this->success($regions, 'Regions retrieved successfully');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }

@@ -241,4 +241,9 @@ class ComplaintsService
             throw $e;
         }
     }
+
+    public function getAllRegions()
+    {
+        return $this->locationRepo->getAllRegion();
+    }
 }
