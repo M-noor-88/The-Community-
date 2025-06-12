@@ -28,6 +28,7 @@ class RolesAndUsersSeeder extends Seeder
         $fields = VolunteerField::all();
 
         // Create Clients
+        /*
         User::factory(5)->create()->each(function ($user) use ($skills, $fields) {
             $user->assignRole('client');
 
@@ -45,6 +46,8 @@ class RolesAndUsersSeeder extends Seeder
             $profile->skills()->attach($skills->random(rand(1, 3))->pluck('id')->toArray());
             $profile->fields()->attach($fields->random(rand(1, 2))->pluck('id')->toArray());
         });
+        */
+
 
         // Create Volunteer Admins
         User::factory(2)->create()->each(function ($user) {
@@ -68,6 +71,14 @@ $arabicClients = [
     ['name' => 'سارة يوسف', 'email' => 'sara@example.com'],
     ['name' => 'محمود علي', 'email' => 'mahmoud@example.com'],
     ['name' => 'فاطمة حسين', 'email' => 'fatima@example.com'],
+    ['name' => 'علي عمر', 'email' => 'ali.omar@example.com'],
+    ['name' => 'نورا حسن', 'email' => 'noura@example.com'],
+    ['name' => 'خالد سمير', 'email' => 'khaled.samir@example.com'],
+    ['name' => 'رنا محمود', 'email' => 'rana@example.com'],
+    ['name' => 'يوسف جمال', 'email' => 'youssef.jamal@example.com'],
+    ['name' => 'هدى ناصر', 'email' => 'huda.nasser@example.com'],
+    ['name' => 'سامر خليل', 'email' => 'samer@example.com'],
+    ['name' => 'ميساء علاء', 'email' => 'maysaa@example.com']
 ];
 
 foreach ($arabicClients as $clientData) {
@@ -102,6 +113,7 @@ foreach ($arabicClients as $clientData) {
 
         // Create Government Admin
         User::factory()->create([
+            'name'=> 'أدمن المحافظة',
             'email' => 'govadmin@example.com',
             'password' => Hash::make('password'),
         ])->assignRole('government_admin');

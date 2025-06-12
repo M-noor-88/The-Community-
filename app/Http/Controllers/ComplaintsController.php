@@ -161,4 +161,14 @@ class ComplaintsController extends Controller
             return $this->error($e->getMessage());
         }
     }
+
+    public function getAllRegions(): JsonResponse
+    {
+        try {
+            $regions = $this->complaintsService->getAllRegions();
+            return $this->success($regions, 'Regions retrieved successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
 }
