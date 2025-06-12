@@ -111,6 +111,7 @@ Route::prefix('client/complaint')
     Route::get('/ByID/{id}' , 'complaintsByID');    //get complaints by id
     Route::get('/category/all', 'getAllCategories');
     Route::post('/update/{id}', 'update');
+    Route::get('allRegions', 'getAllRegions');
 
 });
 
