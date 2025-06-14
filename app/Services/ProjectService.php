@@ -166,7 +166,7 @@ class ProjectService
             'donation_total' => $project->donationSummary?->total_donated ?? 0,
             'number_of_participants' => $project->number_of_participant,
             'joined_participants' => $project->participants?->count() ?? 0,
-            'required_amount' => $project->donationSummary?->required_amount ?? 0,
+            'required_amount' => $project->donationSummary?->required_amount ?? '0',
             'created_at' => $project->created_at?->format('d/m/Y'),
         ];
 
