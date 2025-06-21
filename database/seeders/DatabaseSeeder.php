@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             KeywordSeeder::class,
             ProjectSeeder::class,
             CampaignDonationsSeeder::class,
+            ProjectRatingsSeeder::class,
+            ProjectVotesSeeder::class,
 
         ]);
     }
