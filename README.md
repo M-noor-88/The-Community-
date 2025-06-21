@@ -89,36 +89,33 @@ php artisan migrate
 
 # Run the server
 php artisan serve
-
+```
 
 
 🔧 Configuration
 .env keys you need:
-env
-Copy
-Edit
+
 # Database
+```
 DB_CONNECTION=mysql
 DB_DATABASE=your_db
 DB_USERNAME=your_user
 DB_PASSWORD=your_pass
-
+```
 # Sanctum
+```
 SANCTUM_STATEFUL_DOMAINS=localhost
-
+```
 # Cloudinary
+```
 CLOUDINARY_CLOUD_NAME=xxxx
 CLOUDINARY_API_KEY=xxxx
 CLOUDINARY_API_SECRET=xxxx
-
+```
 # Firebase
+```
 FIREBASE_SERVER_KEY=xxxx
+```
 
 
 
-
-### 📌 To-Do Before Uploading to GitHub:
-- Replace `your-username` with your actual GitHub username.
-- Add `LICENSE` file if applicable (MIT is a safe choice).
-- Create a `Postman Collection` and link it if you want.
-- Consider adding a GIF or screenshot at the top (`/docs/demo.gif` or `/docs/screenshot.png`).
