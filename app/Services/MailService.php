@@ -59,7 +59,7 @@ class MailService
 
         $gmail = new Gmail($this->client);
 
-        $from = 'zed.kreshati.2001@gmail.com'; // Must be the Gmail account you're authorized with
+        $from = 'thecommuinty@gmail.com'; // Must be the Gmail account you're authorized with
         $htmlBody = view($view, $data)->render();
 
         $rawMessageString = "From: $from\r\n";
@@ -76,7 +76,10 @@ class MailService
         $message->setRaw($rawMessage);
 
         try {
+            Log::info('Sending Gmail to ' . $to);
+
             $gmail->users_messages->send('me', $message);
+            Log::info('Gmail sent.');
 
             return response()->json(['message' => 'Email sent successfully'], 200);
         } catch (\Exception $e) {

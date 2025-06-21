@@ -108,7 +108,7 @@ class FirebaseNotificationService
             ->post("https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send", $message);
 
         if ($response->failed()) {
-            \Log::info("Erroreeeee" . $response->body());
+            Log::info("Erroreeeee" . $response->body());
             throw new Exception($response->body());
         }
 

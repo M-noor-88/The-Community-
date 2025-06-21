@@ -20,4 +20,3 @@ Route::get('/donation/success', [DonationController::class, 'successview'])->nam
 Route::get('/donation/cancel', [DonationController::class, 'cancel'])->name('donation.cancel');
 
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

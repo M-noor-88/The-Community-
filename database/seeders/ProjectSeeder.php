@@ -466,8 +466,15 @@ class ProjectSeeder extends Seeder
 
             ];
 
+
+            // Simulate donations
+            $donorCount = rand(5, 15);
+            $totalDonated = 0;
+
         foreach ($projects as $project) {
             $type = ['مبادرة', 'حملة رسمية'][rand(0, 1)];
+            $amount = rand(20, 100);
+            $totalDonated += $amount;
 
             DB::table('projects')->insert([
                 'user_id' => rand(1, 7),
@@ -487,6 +494,8 @@ class ProjectSeeder extends Seeder
                 'is_archived' => $project['is_archived'],
             ]);
         }
+
+      
 
     }
 }
