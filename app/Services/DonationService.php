@@ -10,6 +10,7 @@ use Exception;
 use App\Jobs\ProcessStripeDonationJob;
 use Stripe\Webhook;
 use App\Models\CampaignDonation;
+use Illuminate\Support\Facades\Log;
 
 
 class DonationService
@@ -27,6 +28,12 @@ class DonationService
 
         if (! $project) {
             throw new Exception('Project not found.');
+        }
+        Log::info('Donation rejected for project: ' . $project->type . ' ' . $project->status);
+
+        if ($project->type != 'حملة رسمية' || $project->status != 'نشطة') {
+            Log::info('Donation rejected for project: ' . $project->type . ' ' . $project->status);
+            throw new Exception('Project is not active.');
         }
         $totalrequiredAmount = $project->donationSummary->required_amount;
         $totalDonatedAmount = $project->donationSummary->total_donated;
@@ -87,10 +94,12 @@ class DonationService
         );
 
         if ($event->type === 'checkout.session.completed') {
+            Log::info('Stripe checkout session completed.');
             ProcessStripeDonationJob::dispatch($event->data->object, 'success');
         }
 
         if ($event->type === 'payment_intent.payment_failed') {
+            Log::info('Stripe payment intent failed.');
             ProcessStripeDonationJob::dispatch($event->data->object, 'failed');
         }
     }

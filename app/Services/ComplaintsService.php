@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\ComplaintScoringService;
+use App\Jobs\SendUserNotificationJob;
 
 class ComplaintsService
 {
@@ -145,6 +146,23 @@ class ComplaintsService
                     }
                 }
             }
+
+            $owner = $complaint->user;
+            if ($complaint->status == 'مرفوضة' && !empty($request['rejection_reason'])) {
+                $body = "تم رفض الشكوى '{$complaint->title}' وذلك بسبب: {$request['rejection_reason']}.";
+            } else {
+                $body = "تم تحديث الشكوى '{$complaint->title}' إلى الحالة: {$status}.";
+            }
+
+
+            if ($owner && $owner->device_token) {
+                SendUserNotificationJob::dispatch(
+                    $owner->id,
+                    $owner->device_token,
+                    'تحديث حالة الشكوى المقدمة',
+                    $body,
+                );
+            }
             $complaint->update([
                 'status' => $status,
             ]);
@@ -152,7 +170,6 @@ class ComplaintsService
 
             return ['complaint' => new ComplaintResource($complaint)];
         } catch (\Exception $e) {
-            // Clean up image placeholder if it was created
             foreach ($attachedImageIds as $imageId) {
                 $this->imageRepo->deleteImagePlaceholder($imageId);
             }
