@@ -48,7 +48,7 @@ class DonationService
             throw new Exception('User not authenticated.');
         }
 
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe::setApiKey(config('services.stripe.secret'));
         $amount = intval($request['amount']) * 100;
 
         // Create Checkout Session
@@ -90,7 +90,7 @@ class DonationService
         $event = Webhook::constructEvent(
             $payload,
             $sig_header,
-            env('STRIPE_WEBHOOK_SECRET')
+            config('services.stripe.webhook_secret')
         );
 
         if ($event->type === 'checkout.session.completed') {

@@ -42,7 +42,7 @@ class ProjectService
     /**
      * @throws Exception
      */
-    public function  create(array $requestData): Project
+    public function  create(array $requestData): void
     {
         try {
             DB::beginTransaction();
@@ -108,7 +108,7 @@ class ProjectService
                 $this->imageRepo->storeTempImageAndDispatch($requestData['image'], $image->id);
             }
 
-            return $project;
+           // return $project;
 
         } catch (Exception $e) {
             DB::rollBack();
