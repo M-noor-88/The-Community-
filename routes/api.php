@@ -207,6 +207,7 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
 
     Route::get('/official-campaigns', [StatisticsController::class, 'getOfficialCampaigns']);
     Route::get('/initiatives', [StatisticsController::class, 'getInitiatives']);
+    Route::get('/complaints/locations', [StatisticsController::class, 'complaintsByLocation']);
     Route::get('/complaints', [StatisticsController::class, 'getComplaintStats']);
 
     Route::get('/monthly', [StatisticsController::class, 'getMonthlyStatistics']);

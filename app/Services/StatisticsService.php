@@ -111,6 +111,21 @@ class StatisticsService
             })->toArray();
     }
 
+    // Complaints
+    public function getComplaintStatisticsWithLocations(): array
+    {
+        return $this->statisticsRepo->getComplaintsWithLocationAndCategory()
+            ->map(function ($complaint) {
+                return [
+                    'title' => $complaint->title,
+                    'category' => $complaint->category?->name,
+                    'latitude' => $complaint->location?->latitude,
+                    'longitude' => $complaint->location?->longitude,
+                ];
+            })->toArray();
+    }
+
+
     public function getMonthlyStatistics(): array
     {
         return $this->statisticsRepo->getMonthlyCounts()->toArray();

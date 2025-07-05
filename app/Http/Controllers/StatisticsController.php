@@ -55,10 +55,10 @@ class StatisticsController extends Controller
     //     return $this->makeResponse('Projects by location fetched successfully', $this->statisticsService->getProjectsByLocation());
     // }
 
-    // public function complaintsByLocation(): JsonResponse
-    // {
-    //     return $this->makeResponse('Complaints by location fetched successfully', $this->statisticsService->getComplaintsByLocation());
-    // }
+     public function complaintsByLocation(): JsonResponse
+     {
+         return $this->makeResponse('Complaints by location fetched successfully', $this->statisticsService->getComplaintStatisticsWithLocations());
+     }
 
     public function userRoleDistribution(): JsonResponse
     {
