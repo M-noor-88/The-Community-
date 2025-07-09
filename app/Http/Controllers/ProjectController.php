@@ -24,9 +24,9 @@ class ProjectController extends Controller
     public function store(ProjectCreateRequest $request): JsonResponse
     {
         try {
-            $project = $this->projectService->create($request->validated());
+            $this->projectService->create($request->validated());
 
-            return $this->success($project, 'تم إنشاء المشروع بنجاح');
+            return $this->success([], 'تم إنشاء المشروع بنجاح');
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }

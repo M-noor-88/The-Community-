@@ -104,11 +104,12 @@ class ProjectService
 
             DB::commit();
 
+	    
+
             if (isset($requestData['image'])) {
                 $this->imageRepo->storeTempImageAndDispatch($requestData['image'], $image->id);
             }
 
-           // return $project;
 
         } catch (Exception $e) {
             DB::rollBack();
