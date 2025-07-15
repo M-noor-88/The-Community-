@@ -1,22 +1,21 @@
 <?php
 
+use App\Livewire\Campaigns\Index;
+use App\Livewire\Campaigns\Show;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GoogleController;
-use App\Http\Controllers\DonationController;
-use App\Http\Controllers\Web\DashboardController;
+
+Route::view('/', 'welcome');
+
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/campaigns',            Index::class)->name('campaigns.index');
+Route::get('/campaigns/{project}',  Show::class)->name('campaigns.show');
 
-Route::controller(GoogleController::class)
-    ->group(function () {
-        Route::get('/google', 'redirect');
-        Route::get('/google/callback', 'callback');
-    });
-
-Route::get('/donation/success', [DonationController::class, 'successview'])->name('donation.success');
-Route::get('/donation/cancel', [DonationController::class, 'cancel'])->name('donation.cancel');
-
-
+require __DIR__.'/auth.php';
