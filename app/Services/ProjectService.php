@@ -104,7 +104,7 @@ class ProjectService
 
             DB::commit();
 
-	    
+
 
             if (isset($requestData['image'])) {
                 $this->imageRepo->storeTempImageAndDispatch($requestData['image'], $image->id);
@@ -125,7 +125,7 @@ class ProjectService
     {
         $projects = $this->projectRepo->getAllProjectsByType($type, $status);
 
-        return $projects->getCollection()->map(function ($project) {
+        return $projects->map(function ($project) {
             return $this->transformProject($project);
         });
     }

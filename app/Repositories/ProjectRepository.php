@@ -5,8 +5,8 @@ namespace App\Repositories;
 use App\Models\Project;
 use App\Models\VoteProjectTotal;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ProjectRepository
@@ -51,7 +51,7 @@ class ProjectRepository
         ])->where('id', $projectId)->first();
     }
 
-    public function getAllProjectsByType($type = null, $status = null): LengthAwarePaginator
+    public function getAllProjectsByType($type = null, $status = null): Collection
     {
         $query = Project::with([
             'user.clientProfile',
@@ -75,7 +75,7 @@ class ProjectRepository
             $query->where('status', $status);
         }
 
-        return $query->paginate(50);
+        return  $query->inRandomOrder()->limit(50)->get();
     }
 
     public function getProjectsByCategoryAndType($categoryId, $type = null): LengthAwarePaginator
