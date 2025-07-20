@@ -115,6 +115,7 @@ Route::prefix('client/complaint')
 
 });
 
+Route::get('noToken/allRegions' , [ComplaintsController::class , 'getAllRegions']);
 
 
 //------------------------------- Volunteer -------------------------------
