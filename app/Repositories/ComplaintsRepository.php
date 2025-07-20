@@ -107,12 +107,13 @@ class ComplaintsRepository
 
     public function getComplaintCategories(): Collection
     {
-        return ComplaintCategory::select('id', 'name')
+        return ComplaintCategory::select('id', 'name', 'points')
             ->get()
             ->map(function ($category) {
                 return [
                     'category_id' => $category->id,
                     'name' => $category->name,
+                    'points' => $category->points,
                 ];
             });
     }
