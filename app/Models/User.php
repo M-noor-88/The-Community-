@@ -91,4 +91,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rating::class);
     }
+
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            $user->clientProfile()?->delete();
+            $user->volunteerProfile()?->delete();
+            $user->notifications()->delete();
+            $user->interests()->delete();
+            $user->ratings()->delete();
+            $user->participantsProjects()->detach(); // Detach from pivot
+        });
+    }
+
 }

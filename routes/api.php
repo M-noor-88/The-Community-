@@ -246,3 +246,6 @@ Route::prefix('Donation')
 
 // Notifications
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
+
+// Delete User
+Route::middleware('auth:sanctum')->delete('/user/delete', [AuthController::class, 'destroy']);
