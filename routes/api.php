@@ -242,6 +242,7 @@ Route::prefix('Donation')
     ->group(function () {
         Route::post('/stripe/webhook', 'handle');
         Route::get('/monitoring', 'monitoring')->middleware('auth:sanctum')->middleware(['role:government_admin']);
+        Route::get('myDonations' , 'myDonations')->middleware('auth:sanctum');
 });
 
 // Notifications

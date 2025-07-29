@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Repositories\CampaignDonationSumRepository;
 use Stripe\Stripe;
 use App\Repositories\ProjectRepository;
 use Stripe\Checkout\Session;
@@ -16,10 +17,12 @@ use Illuminate\Support\Facades\Log;
 class DonationService
 {
     protected ProjectRepository $ProjectRepository;
+    protected CampaignDonationSumRepository $campaignDonationSumRepository;
 
-    public function __construct(ProjectRepository $ProjectRepo)
+    public function __construct(ProjectRepository $ProjectRepo , CampaignDonationSumRepository $campaignDonationSumRepository)
     {
         $this->ProjectRepository  = $ProjectRepo;
+        $this->campaignDonationSumRepository = $campaignDonationSumRepository;
     }
 
     public function donate(array $request)
@@ -125,4 +128,24 @@ class DonationService
         return $result->toArray();
     }
 
+
+    public function myDonations()
+    {
+        $user_id = (int) Auth::id();
+
+        return $this->campaignDonationSumRepository->myDonations($user_id)->map(function ($donation)  {
+           return [
+               'id' => $donation->id,
+               'projectID' => $donation->project_id,
+               'donated_at'=> $donation->donated_at,
+               'amount'=> $donation->amount,
+               'status'=>$donation->status,
+               'project' => [
+                   'title'=> $donation->project->title,
+                   'description' => $donation->project->description,
+               ]
+
+           ];
+        });
+    }
 }
