@@ -20,7 +20,16 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->unsignedInteger('priority_points')->default(0);
-            $table->enum('status', ['انتظار', 'تم التحقق' , 'مرفوضة' , 'يتم التنفيذ' , 'منجزة'])->default('انتظار');
+            $table->enum('status', [
+                'انتظار',        // submitted
+                'تم التحقق',     // under_review
+                'تم التعيين',     // assigned
+                'يتم التنفيذ',   // in_progress
+                'منجزة',        // resolved
+                'مغلقة',        // closed
+                'مرفوضة',       // rejected
+                'تم التصعيد'     // escalated
+            ])->default('انتظار');
             $table->timestamps();
         });
     }
