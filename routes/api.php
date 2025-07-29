@@ -15,6 +15,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\RatesController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\Volunteer\VolunteerProfileController;
+use App\Http\Controllers\WorkflowController;
 use App\Services\Notifications\FirebaseNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -115,6 +116,7 @@ Route::prefix('client/complaint')
 
 });
 
+Route::get('noToken/allRegions' , [ComplaintsController::class , 'getAllRegions']);
 
 
 //------------------------------- Volunteer -------------------------------
@@ -241,7 +243,19 @@ Route::prefix('Donation')
     ->group(function () {
         Route::post('/stripe/webhook', 'handle');
         Route::get('/monitoring', 'monitoring')->middleware('auth:sanctum')->middleware(['role:government_admin']);
+        Route::get('myDonations' , 'myDonations')->middleware('auth:sanctum');
 });
 
 // Notifications
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
+
+
+// Workflow
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/complaints', [WorkflowController::class, 'index']);
+    Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
+    Route::get('/complaints/{id}/logs', [WorkflowController::class, 'logs']);
+    Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);
+    Route::post('/complaints/{id}/assign', [WorkflowController::class, 'assignToFieldAgent']);
+});
