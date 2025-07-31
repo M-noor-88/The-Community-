@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Campaigns;
 
+use App\Models\Category;
 use App\Services\ProjectService;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
@@ -13,6 +14,9 @@ class Index extends Component
 
     public string $status = 'نشطة';                 // default tab
     protected $paginationTheme = 'tailwind';
+
+    public ?int $category_id = null;  // null means show all categories
+
 
     protected ProjectService $service;
 
@@ -28,13 +32,19 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingCategoryId(): void
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
-        // ONLY local variable – never dehydrated
-        $projects = $this->service
-            ->getAllProjects('حملة رسمية', $this->status);
 
-        return view('livewire.campaigns.index', compact('projects'))
+        $categories = Category::all();
+
+        $projects = $this->service->getAllProjectsByTypeAndStatus('حملة رسمية', $this->status, $this->category_id);
+
+        return view('livewire.campaigns.index', compact('projects', 'categories'))
             ->layout('layouts.app');
     }
 }

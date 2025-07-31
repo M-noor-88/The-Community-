@@ -39,7 +39,7 @@ class LoginForm extends Form
         }
 
         // 2. Now we really are logged in – enforce the role
-        if (! Auth::user()->hasRole('government_admin')) {          // ← or  ! Auth::user()->is_admin
+        if (! Auth::user()->hasAnyRole(['government_admin', 'complaint_manager', 'field_agent'])  ) {          // ← or  ! Auth::user()->is_admin
             Auth::logout();                              // immediately sign the user back out
             RateLimiter::hit($this->throttleKey());      // optional: still count as a failed attempt
 

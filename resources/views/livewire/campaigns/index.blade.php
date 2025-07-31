@@ -1,20 +1,60 @@
-<div  class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 space-y-10 animate-fade-in-up rtl:ml-0">
+<div>
+<div  class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-1 space-y-10 animate-fade-in-up rtl:ml-0">
 
     {{-- Title --}}
     <h1 class="text-4xl font-bold text-right text-gray-900 rtl:ml-0">الحملات الرسمية</h1>
 
-    {{-- Filter pills --}}
-    <div class="flex justify-end gap-2 flex-wrap mt-6 animate-fade-in">
-        @foreach (['نشطة', 'منجزة', 'ملغية'] as $filter)
-            <button wire:click="$set('status', '{{ $filter }}')"
-                    class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300
+
+    <livewire:map-component />
+
+
+    {{-- Sticky Filter Navs --}}
+    <div class="sticky  -top-9 z-10  bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 rounded-xl">
+        {{-- Category Filter Boxes --}}
+        <div class="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-6 gap-2 px-1 py-1 ">
+            @foreach ($categories as $category)
+                @php
+                    $icons = ['🎯', '📦', '🩺', '🌱', '💡', '🔥', '📚'];
+                    $icon = $icons[$loop->index % count($icons)];
+                @endphp
+                <button
+                    wire:click="$set('category_id', {{ $category->id }})"
+                    class="flex flex-col items-center justify-center p-1 rounded-xl shadow-sm transition
+                       duration-300 border text-center
+                       {{ $category_id === $category->id
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow'
+                            : 'bg-white text-gray-800 hover:bg-gray-100' }}">
+                    <div class="text-sm">{{ $icon }}</div>
+                    <div class="mt-1 text-sm/relaxed font-semibold">{{ $category->name }}</div>
+                </button>
+            @endforeach
+
+            {{-- All categories --}}
+            <button
+                wire:click="$set('category_id', null)"
+                class="flex flex-col items-center justify-center p-2 rounded-xl shadow-sm transition
+                   duration-300 border text-center
+                   {{ is_null($category_id)
+                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow'
+                        : 'bg-white text-gray-800 hover:bg-gray-100' }}">
+                <div class="text-sm">🗂️</div>
+                <div class="mt-1 text-sm font-medium">الكل</div>
+            </button>
+        </div>
+
+        {{-- Status Filter Pills --}}
+        <div class="flex justify-center gap-3 flex-wrap px-2 pb-1 animate-fade-in">
+            @foreach (['نشطة', 'منجزة', 'ملغية'] as $filter)
+                <button wire:click="$set('status', '{{ $filter }}')"
+                        class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300
                        border focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500
                        {{ $status === $filter
-                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow'
                             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50' }}">
-                {{ $filter }}
-            </button>
-        @endforeach
+                    {{ $filter }}
+                </button>
+            @endforeach
+        </div>
     </div>
 
     {{-- Projects Grid --}}
@@ -75,4 +115,7 @@
 
     {{-- Pagination --}}
     {{-- <div class="mt-12">{{ $projects->links() }}</div> --}}
+
+
+</div>
 </div>
