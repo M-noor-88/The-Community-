@@ -215,21 +215,21 @@
                         <!-- Priority -->
                         <div class="flex items-center gap-3 text-gray-600 dark:text-gray-300 group transition-colors duration-200">
                             @php
-                                $priorityClass = $complaint->priority_points > 7 ? 'text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300' :
-                                               ($complaint->priority_points > 3 ? 'text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300' :
+                                $priorityClass = $complaint->priority_points > 15 ? 'text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300' :
+                                               ($complaint->priority_points > 10 ? 'text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300' :
                                                'text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300');
-                                $priorityBg = $complaint->priority_points > 7 ? 'bg-red-100 dark:bg-red-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50' :
-                                            ($complaint->priority_points > 3 ? 'bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200 dark:group-hover:bg-amber-800/50' :
+                                $priorityBg = $complaint->priority_points > 15 ? 'bg-red-100 dark:bg-red-900/30 group-hover:bg-red-200 dark:group-hover:bg-red-800/50' :
+                                            ($complaint->priority_points > 10 ? 'bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200 dark:group-hover:bg-amber-800/50' :
                                             'bg-green-100 dark:bg-green-900/30 group-hover:bg-green-200 dark:group-hover:bg-green-800/50');
-                                $priorityText = $complaint->priority_points > 7 ? 'عالي' : ($complaint->priority_points > 3 ? 'متوسط' : 'منخفض');
+                                $priorityText = $complaint->priority_points > 15 ? 'عالي' : ($complaint->priority_points > 10 ? 'متوسط' : 'منخفض');
                             @endphp
 
                             <div class="flex-shrink-0 w-8 h-8 {{ $priorityBg }} rounded-lg flex items-center justify-center transition-colors duration-200 {{ $priorityClass }}">
-                                @if($complaint->priority_points > 7)
+                                @if($complaint->priority_points > 15)
                                     <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                                     </svg>
-                                @elseif($complaint->priority_points > 3)
+                                @elseif($complaint->priority_points > 10)
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                     </svg>
@@ -244,7 +244,7 @@
                                 <span class="mr-2 font-semibold">{{ $priorityText }}</span>
                                 <div class="flex gap-1 mt-1">
                                     @for($i = 0; $i < min($complaint->priority_points, 10); $i++)
-                                        <div class="w-1.5 h-1.5 rounded-full {{ $complaint->priority_points > 7 ? 'bg-red-400' : ($complaint->priority_points > 3 ? 'bg-amber-400' : 'bg-green-400') }} animate-pulse" style="animation-delay: {{ $i * 0.1 }}s"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full {{ $complaint->priority_points > 15 ? 'bg-red-400' : ($complaint->priority_points > 10 ? 'bg-amber-400' : 'bg-green-400') }} animate-pulse" style="animation-delay: {{ $i * 0.1 }}s"></div>
                                     @endfor
                                 </div>
                             </div>

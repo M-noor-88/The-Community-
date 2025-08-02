@@ -19,7 +19,10 @@ Route::get('/campaigns',            Index::class)->name('campaigns.index');
 Route::get('/campaigns/{project}',  Show::class)->name('campaigns.show');
 
 Route::get('/map',            \App\Livewire\MapComponent::class)->name('map');
-Route::get('/complaints',            \App\Livewire\Complaints\ComplaintsTable::class)->name('complaints');
+Route::get('/complaints',            \App\Livewire\Complaints\ComplaintsTable::class)->name('complaints.index');
 Route::get('/complaints/{id}',            \App\Livewire\Complaints\ComplaintShow::class)->name('complaints.show');
+
+
+Route::get('/initiatives', \App\Livewire\Projects\InitativeList::class)->name('initiatives.index');
 
 require __DIR__.'/auth.php';

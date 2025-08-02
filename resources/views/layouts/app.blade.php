@@ -41,7 +41,7 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="px-4 space-y-2">
+        <nav class="px-4 space-y-4">
             <a href="#"
                class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-indigo-100 dark:hover:bg-indigo-700 transition-all duration-200">
                 <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2"
@@ -52,22 +52,22 @@
             </a>
 
             <div class="hidden sm:flex flex-col gap-2">
-                <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate
+                <x-nav-link :href="route('initiatives.index')" :active="request()->routeIs('initiatives.index')" wire:navigate
                             class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-indigo-100 dark:hover:bg-indigo-700 transition-all duration-200">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2"
-                         viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 9l9-6 9 6v6a9 9 0 1 1-18 0z" />
-                    </svg>
-                    <span>{{ __('الصفحة الرئيسية') }}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m2.25 12l8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                    <span>{{ __(' المبادرات المجتمعية') }}</span>
                 </x-nav-link>
 
                 <x-nav-link :href="route('campaigns.index')" :active="request()->routeIs('campaigns.index')" wire:navigate
                             class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-indigo-100 dark:hover:bg-indigo-700 transition-all duration-200">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2"
-                         viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122"/></svg>
                     <span>{{ __('الحملات الرسمية') }}</span>
+                </x-nav-link>
+
+                <x-nav-link :href="route('complaints.index')" :active="request()->routeIs('complaints.index')" wire:navigate
+                            class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-indigo-100 dark:hover:bg-indigo-700 transition-all duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 18a2 2 0 1 0-4 0a2 2 0 0 0 4 0zM8 18a2 2 0 1 0-4 0a2 2 0 0 0 4 0zM8 6a2 2 0 1 0-4 0a2 2 0 0 0 4 0zm12 0a2 2 0 1 0-4 0a2 2 0 0 0 4 0zm-6 6a2 2 0 1 0-4 0a2 2 0 0 0 4 0zM7.5 7.5l3 3M6 8v8m12 0V8M8 6h8m0 12H8"/></svg>
+                    <span>{{ __('ادارة الشكاوي ') }}</span>
                 </x-nav-link>
             </div>
         </nav>

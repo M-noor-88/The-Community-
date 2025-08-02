@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Campaigns;
 
+use App\Models\Project;
 use App\Repositories\CampaignParticipantRepository;
 use App\Repositories\RateRepository;
 use App\Services\DonationService;
 use App\Services\ProjectService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class Show extends Component
@@ -17,6 +19,26 @@ class Show extends Component
     // Injected once in boot()
     protected ProjectService $projectService;
     protected RateRepository $rateRepo;
+
+    public string $newStatus = '';
+
+    public function updateStatus(): void
+    {
+        $project = Project::findOrFail($this->projectId);
+
+        if ($project->type !== 'حملة رسمية') {
+            abort(403, 'غير مسموح تعديل حالة هذا النوع من الحملات.');
+        }
+
+        $this->validate([
+            'newStatus' => ['required', Rule::in(['نشطة', 'منجزة', 'تصويت', 'ملغية'])],
+        ]);
+
+        $project->status = $this->newStatus;
+        $project->save();
+
+        session()->flash('message', 'تم تحديث حالة الحملة بنجاح.');
+    }
 
     /* ------------ Lifecycle ------------ */
 
@@ -36,8 +58,11 @@ class Show extends Component
 
     public function render()
     {
+
         /* —— Project details (already transformed by your service) —— */
         $project = $this->projectService->show($this->projectId);
+
+        $this->newStatus = $project['status']; // if `status` comes from `$projectService->show()`
 
         /* —— Ratings —— */
         $rawRatings = $this->rateRepo->getProjectRatings($this->projectId);
