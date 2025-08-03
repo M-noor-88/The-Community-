@@ -13,7 +13,7 @@ use Carbon\Carbon;
 
 class ComplaintWorkflowService
 {
-    protected array $transitions = [
+    public array $transitions = [
         'انتظار' => ['تم التحقق', 'مرفوضة'],
         'تم التحقق' => ['تم التعيين', 'مرفوضة', 'تم التصعيد'],
         'تم التعيين' => ['يتم التنفيذ'],
@@ -23,8 +23,8 @@ class ComplaintWorkflowService
     ];
 
     protected array $rolePermissions = [
-        'government_admin' => ['انتظار', 'تم التحقق', 'تم التعيين', 'مرفوضة', 'مغلقة' ,  'منجزة'],
-        'complaint_manager' => ['تم التحقق', 'تم التعيين', 'يتم التنفيذ'],
+        'government_admin' => ['انتظار', 'تم التحقق', 'مرفوضة', 'مغلقة' ,  'منجزة'],
+        'complaint_manager' => ['تم التحقق' , 'انتظار', 'تم التعيين', 'يتم التنفيذ'],
         'field_agent' => ['يتم التنفيذ', 'تم التعيين' ,  'منجزة'],
     ];
 
@@ -34,9 +34,43 @@ class ComplaintWorkflowService
         'يتم التنفيذ' => 168,
     ];
 
+    protected array $transitionPermissions = [
+        'انتظار' => [
+            'تم التحقق' => ['government_admin', 'complaint_manager'],
+            'مرفوضة' => ['government_admin', 'complaint_manager'],
+        ],
+        'تم التحقق' => [
+            'تم التعيين' => ['government_admin', 'complaint_manager'],
+            'مرفوضة' => ['government_admin', 'complaint_manager'],
+            'تم التصعيد' => ['government_admin', 'complaint_manager'],
+        ],
+        'تم التعيين' => [
+            'يتم التنفيذ' => ['field_agent'],
+        ],
+        'يتم التنفيذ' => [
+            'منجزة' => ['field_agent'],
+        ],
+        'منجزة' => [
+            'مغلقة' => ['government_admin'],
+        ],
+        'تم التصعيد' => [
+            'تم التحقق' => ['government_admin', 'complaint_manager'],
+        ],
+    ];
+
+
+    public function canRoleTransition(string $role, string $from, string $to): bool
+    {
+        return in_array($to, $this->transitions[$from] ?? []) &&
+            in_array($role, $this->transitionPermissions[$from][$to] ?? []);
+    }
+
+
+
     public function canTransition(Complaint $complaint, string $to): bool
     {
         $from = $complaint->status;
+
         return isset($this->transitions[$from]) && in_array($to, $this->transitions[$from]);
     }
 
@@ -58,6 +92,11 @@ class ComplaintWorkflowService
         if (!$this->hasPermission($role, $from)) {
             throw ValidationException::withMessages(['role' => 'ليس لديك صلاحية تغيير الحالة الحالية']);
         }
+
+        if (! $this->canRoleTransition($role, $from, $to)) {
+            throw ValidationException::withMessages(['status' => 'ليس لديك صلاحية تغيير الحالة من ' . $from . ' إلى ' . $to]);
+        }
+
 
         $this->closePreviousStatusDuration($complaint, $from);
 
@@ -126,4 +165,22 @@ class ComplaintWorkflowService
             ->pluck('count', 'status')
             ->toArray();
     }
+
+
+    public function assignToRandomAgent(Complaint $complaint): array
+    {
+        $agent = \App\Models\User::role('field_agent')->inRandomOrder()->first();
+
+        if (!$agent) {
+            throw ValidationException::withMessages(['assigned_to' => 'لا يوجد موظف ميداني متاح حالياً']);
+        }
+
+        $complaint->update(['assigned_to' => $agent->id]);
+
+        return [
+            'agent_name' => $agent->name,
+            'agent_id' => $agent->id,
+        ];
+    }
+
 }
