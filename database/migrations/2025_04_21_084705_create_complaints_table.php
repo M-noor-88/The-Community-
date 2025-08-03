@@ -28,7 +28,6 @@ return new class extends Migration
                 'منجزة',        // resolved
                 'مغلقة',        // closed
                 'مرفوضة',       // rejected
-                'تم التصعيد'     // escalated
             ])->default('انتظار');
             $table->timestamps();
         });

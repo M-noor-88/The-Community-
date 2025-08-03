@@ -259,3 +259,37 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);
     Route::post('/complaints/{id}/assign', [WorkflowController::class, 'assignToFieldAgent']);
 });
+
+
+
+//  All routes below require authentication
+Route::middleware('auth:sanctum')->group(function () {
+
+    // 📄 استعراض كل الشكاوى حسب الدور
+    Route::get('/complaints', [WorkflowController::class, 'index']);
+
+    // 📄 تفاصيل شكوى واحدة
+    Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
+
+    // 📝 تغيير حالة الشكوى
+    Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);
+
+    // 📜 سجل التحركات (اللوغ)
+    Route::get('/complaints/{id}/logs', [WorkflowController::class, 'logs']);
+
+    // 🤖 تعيين موظف ميداني تلقائيًا
+    Route::post('/complaints/{id}/auto-assign', [WorkflowController::class, 'autoAssign']);
+
+    // 📊 إحصائيات الحالات لجميع الشكاوى
+    Route::get('/complaints/stats/all', [WorkflowController::class, 'stats']);
+
+    // 🚨 عرض الشكاوى التي تم تصعيدها
+    Route::get('/complaints/escalated', [WorkflowController::class, 'escalated']);
+
+    // ❓ هل يملك الدور صلاحية تغيير الحالة
+    Route::post('/complaints/{id}/can-transition', [WorkflowController::class, 'canTransition']);
+
+    // ❓ هل يملك الدور صلاحية تغيير الحالة
+    Route::get('complaints/{id}/available-transitions', [WorkflowController::class, 'availableTransitions']);
+
+});

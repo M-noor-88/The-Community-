@@ -15,23 +15,16 @@ class ComplaintWorkflowService
 {
     public array $transitions = [
         'انتظار' => ['تم التحقق', 'مرفوضة'],
-        'تم التحقق' => ['تم التعيين', 'مرفوضة', 'تم التصعيد'],
+        'تم التحقق' => ['تم التعيين', 'مرفوضة'],
         'تم التعيين' => ['يتم التنفيذ'],
         'يتم التنفيذ' => ['منجزة'],
         'منجزة' => ['مغلقة'],
-        'تم التصعيد' => ['تم التحقق'],
     ];
 
     protected array $rolePermissions = [
-        'government_admin' => ['انتظار', 'تم التحقق', 'مرفوضة', 'مغلقة' ,  'منجزة'],
-        'complaint_manager' => ['تم التحقق' , 'انتظار', 'تم التعيين', 'يتم التنفيذ'],
-        'field_agent' => ['يتم التنفيذ', 'تم التعيين' ,  'منجزة'],
-    ];
-
-    protected array $statusEscalationTimes = [
-        'تم التحقق' => 48,
-        'تم التعيين' => 72,
-        'يتم التنفيذ' => 168,
+        'government_admin' => ['انتظار', 'تم التحقق', 'مرفوضة' ,'مغلقة' , 'منجزة' ],
+        'complaint_manager' => ['تم التحقق', 'انتظار', 'تم التعيين', 'يتم التنفيذ'],
+        'field_agent' => ['يتم التنفيذ', 'تم التعيين', 'منجزة'],
     ];
 
     protected array $transitionPermissions = [
@@ -42,7 +35,6 @@ class ComplaintWorkflowService
         'تم التحقق' => [
             'تم التعيين' => ['government_admin', 'complaint_manager'],
             'مرفوضة' => ['government_admin', 'complaint_manager'],
-            'تم التصعيد' => ['government_admin', 'complaint_manager'],
         ],
         'تم التعيين' => [
             'يتم التنفيذ' => ['field_agent'],
@@ -53,9 +45,6 @@ class ComplaintWorkflowService
         'منجزة' => [
             'مغلقة' => ['government_admin'],
         ],
-        'تم التصعيد' => [
-            'تم التحقق' => ['government_admin', 'complaint_manager'],
-        ],
     ];
 
 
@@ -64,7 +53,6 @@ class ComplaintWorkflowService
         return in_array($to, $this->transitions[$from] ?? []) &&
             in_array($role, $this->transitionPermissions[$from][$to] ?? []);
     }
-
 
 
     public function canTransition(Complaint $complaint, string $to): bool
@@ -136,27 +124,6 @@ class ComplaintWorkflowService
         }
     }
 
-    public function checkAndEscalate(Complaint $complaint): void
-    {
-        $currentStatus = $complaint->status;
-
-        if (!isset($this->statusEscalationTimes[$currentStatus])) {
-            return;
-        }
-
-        $durationAllowed = $this->statusEscalationTimes[$currentStatus];
-        $lastChanged = $complaint->last_status_changed_at;
-
-        if (!$lastChanged) {
-            return;
-        }
-
-        $hoursPassed = now()->diffInHours($lastChanged);
-
-        if ($hoursPassed >= $durationAllowed && $this->canTransition($complaint, 'تم التصعيد')) {
-            $this->transition($complaint, 'تم التصعيد', "تم التصعيد تلقائيًا بعد تجاوز المدة المسموح بها في حالة {$currentStatus}");
-        }
-    }
 
     public function getComplaintsCountByStatus(): array
     {

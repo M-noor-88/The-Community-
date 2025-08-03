@@ -54,4 +54,10 @@ class Complaint extends Model
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
+
+    public function statusDurations()
+    {
+        return $this->hasMany(\App\Models\ComplaintStatusDuration::class);
+    }
+
 }

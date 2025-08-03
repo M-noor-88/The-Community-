@@ -23,7 +23,14 @@ class WorkflowController extends Controller
 
         $complaint = Complaint::findOrFail($id);
         $workflow = new ComplaintWorkflowService();
+
+        // تنفيذ الانتقال
         $workflow->transition($complaint, $request->status, $request->notes);
+
+        // إذا كانت الحالة الجديدة "تم التعيين" → نفذ تعيين الموظف تلقائيًا
+        if ($request->status === 'تم التعيين') {
+            $workflow->assignToRandomAgent($complaint);
+        }
 
         return response()->json(['message' => 'تم تغيير حالة الشكوى بنجاح']);
     }
@@ -33,24 +40,86 @@ class WorkflowController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->hasRole('client')) {
-            $complaints = Complaint::where('user_id', $user->id)->get();
-        } elseif ($user->hasRole('field_agent')) {
-            $complaints = Complaint::where('assigned_to', $user->id)->get();
-        } else {
-            $complaints = Complaint::all(); // admin or manager
-        }
+        $complaints = Complaint::with('category')
+            ->latest()
+            ->take(50)
+            ->get();
 
-        return response()->json($complaints);
+        $response = $complaints->map(function ($complaint) {
+            return [
+                'id' => $complaint->id,
+                'title' => $complaint->title,
+                'region' => $complaint->region,
+                'status' => $complaint->status,
+                'category' => $complaint->category?->name,
+                'priority'=> $complaint->priority_points,
+                'created_at' => $complaint->created_at->format('Y-m-d H:i'),
+            ];
+        });
+
+        return response()->json($response);
     }
+
+
+
 
     public function show($id): \Illuminate\Http\JsonResponse
     {
-        $complaint = Complaint::with(['workflowLogs.user'])->findOrFail($id);
+        $complaint = Complaint::with(['category', 'user', 'assignedAgent', 'workflowLogs.user', 'statusDurations'])
+            ->findOrFail($id);
+
+        $mappedComplaint = [
+            'id' => $complaint->id,
+            'title' => $complaint->title,
+            'description' => $complaint->description,
+            'region' => $complaint->region,
+            'status' => $complaint->status,
+            'priority_points' => $complaint->priority_points,
+            'created_at' => $complaint->created_at->format('Y-m-d H:i'),
+            'last_status_changed_at' => optional($complaint->last_status_changed_at)->format('Y-m-d H:i'),
+            'category' => $complaint->category?->name,
+            'user' => [
+                'id' => $complaint->user->id,
+                'name' => $complaint->user->name,
+            ],
+            'assigned_agent' => $complaint->assignedAgent ? [
+                'id' => $complaint->assignedAgent->id,
+                'name' => $complaint->assignedAgent->name,
+            ] : null,
+        ];
+
+        $logs = $complaint->workflowLogs->map(function ($log) {
+            return [
+                'id' => $log->id,
+                'from_status' => $log->from_status,
+                'to_status' => $log->to_status,
+                'role' => $log->role,
+                'notes' => $log->notes,
+                'date' => \Carbon\Carbon::parse($log->created_at)->format('Y-m-d H:i'),
+                'user' => [
+                    'id' => $log->user->id ?? null,
+                    'name' => $log->user->name ?? 'غير معروف',
+                    'email' => $log->user->email ?? null,
+                ]
+            ];
+        });
+
+        $durations = $complaint->statusDurations->map(function ($duration) {
+            $entered = \Carbon\Carbon::parse($duration->entered_at);
+            $left = $duration->left_at ? \Carbon\Carbon::parse($duration->left_at) : now();
+
+            return [
+                'status' => $duration->status,
+                'entered_at' => $entered->format('Y-m-d H:i'),
+                'left_at' => $duration->left_at ? $left->format('Y-m-d H:i') : '',
+                'duration_readable' => $entered->diffForHumans($left, true),
+            ];
+        });
 
         return response()->json([
-            'complaint' => $complaint,
-            'workflow_logs' => $complaint->workflowLogs()->with('user')->latest()->get(),
+            'complaint' => $mappedComplaint,
+            'workflow_logs' => $logs,
+            'status_durations' => $durations,
         ]);
     }
 
@@ -153,5 +222,69 @@ class WorkflowController extends Controller
        ]);
    }
 
+
+    public function stats(): \Illuminate\Http\JsonResponse
+    {
+        $stats = (new ComplaintWorkflowService())->getComplaintsCountByStatus();
+        return response()->json($stats);
+    }
+
+    public function checkEscalation($id): \Illuminate\Http\JsonResponse
+    {
+        $complaint = Complaint::findOrFail($id);
+        (new ComplaintWorkflowService())->checkAndEscalate($complaint);
+
+        return response()->json(['message' => 'تم التحقق من التصعيد التلقائي لهذه الشكوى.']);
+    }
+
+    public function autoAssign($id): \Illuminate\Http\JsonResponse
+    {
+        $complaint = Complaint::findOrFail($id);
+        $agent = (new ComplaintWorkflowService())->assignToRandomAgent($complaint);
+
+        return response()->json([
+            'message' => 'تم تعيين موظف ميداني تلقائيًا.',
+            'agent' => $agent,
+        ]);
+    }
+
+    public function escalated(): \Illuminate\Http\JsonResponse
+    {
+        $complaints = Complaint::where('status', 'تم التصعيد')->latest()->get();
+        return response()->json($complaints);
+    }
+
+    public function canTransition(Request $request, $id)
+    {
+        $complaint = Complaint::findOrFail($id);
+        $targetStatus = $request->input('to');
+
+        $workflow = new ComplaintWorkflowService();
+        $can = $workflow->canTransition($complaint, $targetStatus) &&
+            $workflow->canRoleTransition(Auth::user()->getRoleNames()[0], $complaint->status, $targetStatus);
+
+        return response()->json(['can_transition' => $can]);
+    }
+
+
+    public function availableTransitions($id): \Illuminate\Http\JsonResponse
+    {
+        $complaint = Complaint::findOrFail($id);
+        $workflow = new ComplaintWorkflowService();
+        $currentStatus = $complaint->status;
+        $role = Auth::user()->getRoleNames()[0];
+
+        $nextStatuses = $workflow->transitions[$currentStatus] ?? [];
+
+        // فلترة الحالات بناءً على صلاحيات الدور
+        $allowed = array_filter($nextStatuses, function ($toStatus) use ($workflow, $role, $currentStatus) {
+            return $workflow->canRoleTransition($role, $currentStatus, $toStatus);
+        });
+
+        return response()->json([
+            'current_status' => $currentStatus,
+            'allowed_transitions' => array_values($allowed)
+        ]);
+    }
 
 }
