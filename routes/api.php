@@ -283,9 +283,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // 📊 إحصائيات الحالات لجميع الشكاوى
     Route::get('/complaints/stats/all', [WorkflowController::class, 'stats']);
 
-    // 🔁 التحقق يدويًا من التصعيد التلقائي لشكوى
-    Route::post('/complaints/{id}/check-escalation', [WorkflowController::class, 'checkEscalation']);
-
     // 🚨 عرض الشكاوى التي تم تصعيدها
     Route::get('/complaints/escalated', [WorkflowController::class, 'escalated']);
 
