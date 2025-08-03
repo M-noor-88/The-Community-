@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AiComplaintClassifier;
 use App\Http\Requests\ComplaintCategoryRequest;
 use App\Http\Requests\ComplaintRequest;
 use App\Http\Requests\FilterComplaintRequest;
@@ -61,6 +62,12 @@ class ComplaintsController extends Controller
     public function store(ComplaintRequest $request): JsonResponse
     {
         try {
+            $description = $request->input('description');
+
+            if (!AiComplaintClassifier::isValidComplaint($description)) {
+                return $this->error('تم رفض الشكوى', 422);
+            }
+
             $complaint = $this->complaintsService->createComplaint($request->all());
 
             return $this->success($complaint, 'Complaint created successfully', 201);

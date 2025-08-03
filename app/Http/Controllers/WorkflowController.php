@@ -54,74 +54,6 @@ class WorkflowController extends Controller
         ]);
     }
 
-//    public function logs($id)
-//    {
-//        $complaint = Complaint::findOrFail($id);
-//        return response()->json($complaint->workflowLogs()->latest()->get());
-//
-////        return response()->json($complaint->with('workflowLogs.user')->latest()->get()->map(function ($comp) {
-////            return [
-////
-////                'log_id' => $comp->workflowLogs->id,
-////                'region' => $comp->region,
-////                'title'=> $comp->title,
-////                'priority_points' => $comp->priority_points,
-////
-////            ];
-////        }));
-//    }
-
-//    public function logs($id)
-//    {
-//        $complaint = Complaint::with(['workflowLogs', 'workflowLogs.user'])->findOrFail($id);
-//
-//        $response = [
-//            'complaint' => [
-//                'id' => $complaint->id,
-//                'title' => $complaint->title,
-//                'status' => $complaint->status,
-//                'created_at' => $complaint->created_at->formate(' H:M:S')
-//            ],
-//            'logs' => $complaint->workflowLogs->map(function($log) {
-//                return [
-//                    'action' => $this->getActionDescription($log->from_status, $log->to_status),
-//                    'from_status' => $log->from_status,
-//                    'to_status' => $log->to_status,
-//                    'changed_by' => [
-//                        'id' => $log->changed_by,
-//                        'role' => $log->role
-//                    ],
-//                    'notes' => $log->notes,
-//                    'date' => $log->created_at
-//                ];
-//            })
-//        ];
-//
-//        return response()->json($response);
-//    }
-//
-//    protected function getActionDescription($fromStatus, $toStatus)
-//    {
-//        $actions = [
-//            'انتظار' => [
-//                'تم التحقق' => 'تم التحقق الأولي'
-//            ],
-//            'تم التحقق' => [
-//                'تم التعيين' => 'تم تعيين موظف ميداني'
-//            ],
-//            'تم التعيين' => [
-//                'يتم التنفيذ' => 'بدأ التنفيذ الميداني'
-//            ],
-//            'يتم التنفيذ' => [
-//                'منجزة' => 'تم إكمال العمل'
-//            ],
-//            'منجزة' => [
-//                'مغلقة' => 'تم إغلاق الشكوى'
-//            ]
-//        ];
-//
-//        return $actions[$fromStatus][$toStatus] ?? "تم تغيير الحالة من {$fromStatus} إلى {$toStatus}";
-//    }
 
 
 
@@ -201,10 +133,8 @@ class WorkflowController extends Controller
    {
        $complaint = Complaint::with('category')->findOrFail($complaintId);
 
-       // استخرج القسم المرتبط بالشكوى
        $categoryName = $complaint->category->name;
 
-       // جلب موظف ميداني بشكل عشوائي بدون ربط بالجداول الأخرى
        $agent = \App\Models\User::role('field_agent')
            ->inRandomOrder()
            ->first();
