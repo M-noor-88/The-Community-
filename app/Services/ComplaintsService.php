@@ -66,13 +66,6 @@ class ComplaintsService
 
     public function createComplaint(array $request): array
     {
-        // Check if user has already submitted 2 complaints this month
-        $userId = Auth::id();
-        $complaintCount = $this->complaintsRepo->countUserComplaintsThisMonth($userId);
-
-        if ($complaintCount >= 2) {
-            throw new \Exception('لقد تجاوزت الحد المسموح من الشكاوى لهذا الشهر');
-        }
 
         $complaintImages = $request['complaintImages'] ?? [];
         $attachedImageIds = [];

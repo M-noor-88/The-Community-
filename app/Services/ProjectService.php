@@ -13,6 +13,7 @@ use App\Repositories\ProjectRepository;
 use App\Repositories\RecommendationRepository;
 use App\Services\DonationService;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -297,5 +298,13 @@ class ProjectService
         return $query->get()->map(function ($project) {
             return $this->transformProject($project);
         });
+    }
+
+    public function getRelatedProjects(int $id): Collection
+    {
+        $project = $this->projectRepo->get($id);
+
+        $projects = $this->projectRepo->getRelatedProjects($project);
+        return $projects->map(fn ($project) => $this->transformProject($project));
     }
 }

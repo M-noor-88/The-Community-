@@ -148,4 +148,16 @@ class ProjectController extends Controller
             return $this->error("Failed :" . $e->getMessage());
         }
     }
+
+    public function related(int $id): JsonResponse
+    {
+        try {
+            $relatedProjects = $this->projectService->getRelatedProjects($id);
+            return $this->success($relatedProjects);
+        }catch (Exception $e)
+        {
+            return $this->error("Failed :" . $e->getMessage());
+        }
+
+    }
 }

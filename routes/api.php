@@ -249,6 +249,7 @@ Route::prefix('Donation')
 // Notifications
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 
+// Updates --------------------------------------------
 
 // Workflow
 
@@ -293,3 +294,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('complaints/{id}/available-transitions', [WorkflowController::class, 'availableTransitions']);
 
 });
+
+// projects
+Route::get('/projects/{id}/related', [ProjectController::class, 'related']);

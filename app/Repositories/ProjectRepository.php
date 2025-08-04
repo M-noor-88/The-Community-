@@ -203,4 +203,16 @@ class ProjectRepository
         return $query->paginate(50);
 
     }
+
+    public function getRelatedProjects(Project $project, int $limit = 5)
+    {
+        return Project::where('category_id', $project->category_id)
+            ->where('id', '!=', $project->id)
+            ->where('is_archived', false)
+            ->where('type' , 'حملة رسمية')
+            ->whereIn('status' , ['نشطة' , 'منجزة'])
+            ->latest()
+            ->take($limit)
+            ->get();
+    }
 }
