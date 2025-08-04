@@ -297,3 +297,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // projects
 Route::get('/projects/{id}/related', [ProjectController::class, 'related']);
+
+// Delete User
+Route::middleware('auth:sanctum')->delete('/user/delete', [AuthController::class, 'destroy']);

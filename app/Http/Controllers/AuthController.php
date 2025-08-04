@@ -7,11 +7,13 @@ use App\Http\Requests\ConfirmRegistrationRequest;
 use App\Http\Requests\ConfirmResetRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\RegisterVolunteerReq;
+use App\Models\User;
 use App\Services\AuthService;
 use App\Traits\JsonResponseTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -111,5 +113,17 @@ class AuthController extends Controller
         } catch (Exception $e) {
             return $this->error($e->getMessage());
         }
+    }
+
+    public function destroy(): JsonResponse
+    {
+        $user = User::findOrFail(Auth::id());
+
+        $this->authService->deleteUser($user);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User account and related data deleted successfully.',
+        ]);
     }
 }

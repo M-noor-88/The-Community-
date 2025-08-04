@@ -128,7 +128,7 @@ class ProjectService
     {
         $projects = $this->projectRepo->getAllProjectsByType($type, $status);
 
-        return $projects->getCollection()->map(function ($project) {
+        return $projects->map(function ($project) {
             return $this->transformProject($project);
         });
     }

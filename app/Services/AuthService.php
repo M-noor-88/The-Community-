@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Requests\RegisterRequest;
 use App\Jobs\SendResetPasswordEmailJob;
 use App\Jobs\SendVerificationEmailJob;
+use App\Models\User;
 use App\Repositories\AuthRepository;
 use App\Repositories\ClientProfileRepository;
 use App\Repositories\ImageRepository;
@@ -228,5 +229,13 @@ class AuthService
     public function logout(Request $request): void
     {
         $this->authRepository->logout($request);
+    }
+
+
+    public function deleteUser(User $user): void
+    {
+        DB::transaction(function () use ($user) {
+            $user->delete();
+        });
     }
 }
