@@ -15,6 +15,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\RatesController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\Volunteer\VolunteerProfileController;
+use App\Http\Controllers\WorkflowController;
 use App\Services\Notifications\FirebaseNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -242,10 +243,60 @@ Route::prefix('Donation')
     ->group(function () {
         Route::post('/stripe/webhook', 'handle');
         Route::get('/monitoring', 'monitoring')->middleware('auth:sanctum')->middleware(['role:government_admin']);
+        Route::get('myDonations' , 'myDonations')->middleware('auth:sanctum');
 });
 
 // Notifications
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
+
+// Updates --------------------------------------------
+
+// Workflow
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/complaints', [WorkflowController::class, 'index']);
+    Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
+    Route::get('/complaints/{id}/logs', [WorkflowController::class, 'logs']);
+    Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);
+    Route::post('/complaints/{id}/assign', [WorkflowController::class, 'assignToFieldAgent']);
+});
+
+
+
+//  All routes below require authentication
+Route::middleware('auth:sanctum')->group(function () {
+
+    // 📄 استعراض كل الشكاوى حسب الدور
+    Route::get('/complaints', [WorkflowController::class, 'index']);
+
+    // 📄 تفاصيل شكوى واحدة
+    Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
+
+    // 📝 تغيير حالة الشكوى
+    Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);
+
+    // 📜 سجل التحركات (اللوغ)
+    Route::get('/complaints/{id}/logs', [WorkflowController::class, 'logs']);
+
+    // 🤖 تعيين موظف ميداني تلقائيًا
+    Route::post('/complaints/{id}/auto-assign', [WorkflowController::class, 'autoAssign']);
+
+    // 📊 إحصائيات الحالات لجميع الشكاوى
+    Route::get('/complaints/stats/all', [WorkflowController::class, 'stats']);
+
+    // 🚨 عرض الشكاوى التي تم تصعيدها
+    Route::get('/complaints/escalated', [WorkflowController::class, 'escalated']);
+
+    // ❓ هل يملك الدور صلاحية تغيير الحالة
+    Route::post('/complaints/{id}/can-transition', [WorkflowController::class, 'canTransition']);
+
+    // ❓ هل يملك الدور صلاحية تغيير الحالة
+    Route::get('complaints/{id}/available-transitions', [WorkflowController::class, 'availableTransitions']);
+
+});
+
+// projects
+Route::get('/projects/{id}/related', [ProjectController::class, 'related']);
 
 // Delete User
 Route::middleware('auth:sanctum')->delete('/user/delete', [AuthController::class, 'destroy']);

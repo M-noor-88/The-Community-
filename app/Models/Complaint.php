@@ -11,7 +11,7 @@ class Complaint extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'complaint_category_id', 'location_id',
+        'user_id', 'complaint_category_id', 'location_id', 'assigned_to', 'last_status_changed_at',
         'title', 'description', 'status','region', 'priority_points'
     ];
 
@@ -35,11 +35,6 @@ class Complaint extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function participants()
-    {
-        return $this->hasMany(CampaignParticipant::class);
-    }
-
     public function complaintImages()
     {
         return $this->belongsToMany(Image::class, 'complaint_images')->where('type', 'complaint');
@@ -49,4 +44,20 @@ class Complaint extends Model
     {
         return $this->belongsToMany(Image::class, 'complaint_images')->where('type', 'achievement');
     }
+
+    public function workflowLogs()
+    {
+        return $this->hasMany(ComplaintWorkflowLog::class);
+    }
+
+    public function assignedAgent()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    public function statusDurations()
+    {
+        return $this->hasMany(\App\Models\ComplaintStatusDuration::class);
+    }
+
 }

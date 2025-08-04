@@ -146,4 +146,13 @@ class ComplaintsRepository
     {
         return ComplaintCategory::findOrFail($id);
     }
+
+    public function countUserComplaintsThisMonth(int $userId): int
+    {
+        return Complaint::where('user_id', $userId)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+    }
+
 }

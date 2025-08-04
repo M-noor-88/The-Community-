@@ -17,7 +17,7 @@ class LocationAndImageSeeder extends Seeder
     {
 
         DB::table('images')->insert([
-            ['id' => 1,  'image_url' => 'http://just-fake-url', 'created_at' => '2025-05-21 15:22:05', 'updated_at' => '2025-05-21 15:22:05'],
+            ['id' => 1,  'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1754297662/secure_uploads/images/f7b8d27d-61a0-4b30-9e28-643aec52dbd9.png', 'created_at' => '2025-05-21 15:22:05', 'updated_at' => '2025-05-21 15:22:05'],
             ['id' => 2,  'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1747859746/secure_uploads/images/265a5fd7-e009-42fe-b41a-160fd41bc426.jpg', 'created_at' => '2025-05-21 15:30:29', 'updated_at' => '2025-05-21 17:35:47'],
             ['id' => 3,  'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1747859748/secure_uploads/images/4359b0c3-d534-4fbe-8fd3-5a36ae040837.jpg', 'created_at' => '2025-05-21 15:37:09', 'updated_at' => '2025-05-21 17:35:48'],
             ['id' => 4,  'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1747859749/secure_uploads/images/a9ecf1ff-f3be-4fab-ac28-525eb7fd9642.jpg', 'created_at' => '2025-05-21 17:15:36', 'updated_at' => '2025-05-21 17:35:49'],

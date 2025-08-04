@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\DonationService;
 use Illuminate\Support\Facades\Log;
@@ -63,5 +64,18 @@ class DonationController extends Controller
     {
         $data = $this->donationService->monitoring();
         return $this->success($data, 'Donations retrieved successfully', 201);
+    }
+
+
+    public function myDonations() : JsonResponse
+    {
+        try {
+            $data = $this->donationService->myDonations();
+            return $this->success($data );
+
+        }catch (\Exception $exception)
+        {
+            return $this->error("Error fetching Donations : " . $exception->getMessage());
+        }
     }
 }

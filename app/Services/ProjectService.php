@@ -13,6 +13,9 @@ use App\Repositories\ProjectRepository;
 use App\Repositories\RecommendationRepository;
 use App\Services\DonationService;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -258,6 +261,50 @@ class ProjectService
     public function getPromoted()
     {
         $projects = $this->projectRepo->getPromoted();
+        return $projects->map(fn ($project) => $this->transformProject($project));
+    }
+
+
+
+    public function getAllProjectsByTypeAndStatus($type = null, $status = null , $category_id = null): Collection
+    {
+        $query = Project::with([
+            'user.clientProfile',
+            'image',
+            'category',
+            'location',
+            'votes',
+            'totalVotes',
+            'donations',
+            'donationSummary',
+            'participants',
+        ]);
+
+        if ($status == 'منجزة') {
+            $query->with('ratings.user');
+        }
+
+        $query->where('type', $type);
+
+        if (! is_null($status)) {
+            $query->where('status', $status);
+        }
+
+        if (! is_null($category_id)) {
+            $query->where('category_id', $category_id);
+        }
+
+
+        return $query->get()->map(function ($project) {
+            return $this->transformProject($project);
+        });
+    }
+
+    public function getRelatedProjects(int $id): Collection
+    {
+        $project = $this->projectRepo->get($id);
+
+        $projects = $this->projectRepo->getRelatedProjects($project);
         return $projects->map(fn ($project) => $this->transformProject($project));
     }
 }
