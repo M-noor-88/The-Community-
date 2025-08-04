@@ -66,6 +66,7 @@ class ComplaintsService
 
     public function createComplaint(array $request): array
     {
+
         $complaintImages = $request['complaintImages'] ?? [];
         $attachedImageIds = [];
         $title = $request['title'];
