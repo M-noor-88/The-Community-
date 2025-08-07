@@ -87,7 +87,6 @@ class ComplaintsService
                 throw new Exception('User not authenticated.');
             }
 
-            $points=$this->pointsService->calculate($title, $description, $area, $categoryId);
 
             $complaint = $this->complaintsRepo->create([
                 'user_id' => $user->id,
@@ -97,8 +96,10 @@ class ComplaintsService
                 'title' => $title,
                 'description' => $description ?? null,
                 'status' => 'انتظار',
-                'priority_points' => $points,
+                'priority_points' => 0,
             ]);
+
+
 
             if (! empty($complaintImages)) {
                 $images = is_array($complaintImages) ? $complaintImages : [$complaintImages];
@@ -108,6 +109,11 @@ class ComplaintsService
                     $complaint->complaintImages()->attach($attachedImageIds, ['type' => 'complaint']);
                 }
             }
+
+            $points=$this->pointsService->calculate($complaint->id);
+            $complaint['priority_points']=$points;
+            $complaint->save();
+
             DB::commit();
 
             return ['complaint' => new ComplaintResource($complaint)];
