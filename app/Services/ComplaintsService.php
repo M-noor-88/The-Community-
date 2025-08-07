@@ -66,7 +66,6 @@ class ComplaintsService
 
     public function createComplaint(array $request): array
     {
-
         $complaintImages = $request['complaintImages'] ?? [];
         $attachedImageIds = [];
         $title = $request['title'];
@@ -172,7 +171,11 @@ class ComplaintsService
             }
             $complaint->update([
                 'status' => $status,
+                'last_status_changed_at' => now(),
+
             ]);
+
+
             DB::commit();
 
             return ['complaint' => new ComplaintResource($complaint)];

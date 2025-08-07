@@ -9,6 +9,7 @@ enum ComplaintStatus: string
     case InProgress = 'يتم التنفيذ';
     case Completed = 'منجزة';
     case Rejected = 'مرفوضة';
+    case Closed = 'مغلقة';
 
     public static function values(): array
     {

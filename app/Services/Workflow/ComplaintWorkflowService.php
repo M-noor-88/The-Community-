@@ -91,10 +91,6 @@ class ComplaintWorkflowService
             'entered_at' => now(),
         ]);
 
-        $complaint->update([
-            'status' => $to,
-            'last_status_changed_at' => now(),
-        ]);
 
         ComplaintWorkflowLog::create([
             'complaint_id' => $complaint->id,

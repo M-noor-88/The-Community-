@@ -254,7 +254,7 @@ Route::middleware('auth:sanctum')->get('/notifications', [NotificationController
 // Workflow
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/complaints', [WorkflowController::class, 'index']);
+    // Route::get('/complaints', [WorkflowController::class, 'index']);
     Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
     Route::get('/complaints/{id}/logs', [WorkflowController::class, 'logs']);
     Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);

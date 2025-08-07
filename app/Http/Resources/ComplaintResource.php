@@ -27,7 +27,6 @@ class ComplaintResource extends JsonResource
                 'created_by' => $this->user?->name,
                 'role' => $this->user?->getRoleNames()[0] ?? null,
             ],
-            'image_url' => $this->image?->image_url,
             'category' => $this->category?->name,
             'location' => [
                 'name' => $this->location?->name,
