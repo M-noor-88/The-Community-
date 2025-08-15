@@ -29,6 +29,10 @@ class DatabaseSeeder extends Seeder
             ProjectRatingsSeeder::class,
             ProjectVotesSeeder::class,
             CampaignDonationSummarySeeder::class,
+            ComplaintStatusDurationsSeeder::class,
+            WorkflowRolesSeeder::class,
+            ComplaintWorkflowLogsSeeder::class,
+            CampaignParticipantsSeeder::class,
 
         ]);
     }

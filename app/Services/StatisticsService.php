@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CampaignParticipant;
 use App\Repositories\StatisticsRepository;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Category;
 
 class StatisticsService
 {
@@ -241,6 +242,70 @@ class StatisticsService
             'score_distribution' => $scoreDistribution,
             'most_high_complaint' => $mostHighComplaint,
         ];
+    }
+
+     public function getMostRepeatedComplaint()
+    {
+        return $this->statisticsRepo->getMostRepeatedComplaint();
+    }
+
+     public function getBestCampaignDay()
+    {
+        $data = $this->statisticsRepo->getPerformanceByDay();
+
+        // Get max values for normalization
+        $maxDonations  = max($data['donations']->values()->toArray() ?: [1]);
+        $maxVolunteers = max($data['volunteers']->values()->toArray() ?: [1]);
+
+        $scores = [];
+
+        foreach (['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] as $day) {
+            $donationScore  = ($data['donations'][$day]  ?? 0) / $maxDonations  * 100;
+            $volunteerScore = ($data['volunteers'][$day] ?? 0) / $maxVolunteers * 100;
+
+            // Combined score (equal weight for now)
+            $scores[$day] = $donationScore + $volunteerScore;
+        }
+
+        // Sort by highest score
+        arsort($scores);
+
+        return array_key_first($scores);
+    }
+
+
+    public function getMostComplaintsRegion()
+    {
+        return $this->statisticsRepo->getMostComplaintsRegion();
+    }
+
+    public function getLessComplaintRegion()
+    {
+        return $this->statisticsRepo->getLessComplaintRegion();
+    }
+
+    public function getMostCampaignDonation()
+    {
+        $result= $this->statisticsRepo->getMostCampaignDonation();
+        $category = Category::find($result->category_id);
+        return [ 'category_name' => $category->name,
+         'total_donated' => $result->total_donated
+        ];
+    }
+
+    public function getMostCampaignParticipate()
+    {
+        $result= $this->statisticsRepo->getMostCampaignParticipate();
+        $category = Category::find($result->category_id);
+        return [ 'category_name' => $category->name,
+         'total_participate' => $result->total_participate
+        ];
+    }
+
+    public function getAverageExcecutionComplaint()
+    {
+        $result= $this->statisticsRepo->getAverageExcecutionComplaint();
+        return $result;
     }
 
 }

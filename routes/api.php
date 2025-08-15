@@ -151,9 +151,8 @@ Route::middleware(['auth:sanctum'])->prefix('project')->controller(CampaignParti
 //------------------------------- governorator admin -------------------------------
 
 Route::prefix('admin/complaint')
-->middleware(['role:government_admin'])
-->middleware('auth:sanctum')
 ->controller(ComplaintsController::class)
+->middleware('auth:sanctum')
 ->group(function () {
 
     Route::post('/all' , 'filterComplaintsAdmin');
@@ -166,9 +165,9 @@ Route::prefix('admin/complaint')
 
     /////category
     Route::get('/category/all', 'getAllCategories');
-    Route::post('/category/create', 'createCategory')->name('createCategory');
-    Route::post('/category/update/{id}', 'updateCategory');
-    Route::delete('/category/delete/{id}', 'deleteCategory');
+    Route::post('/category/create', 'createCategory')->middleware(['role:government_admin']);
+    Route::post('/category/update/{id}', 'updateCategory')->middleware(['role:government_admin']);
+    Route::delete('/category/delete/{id}', 'deleteCategory')->middleware(['role:government_admin']);
 });
 
 // تحديث حالة الحملة الرسمية الى منجزة
@@ -223,6 +222,14 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
     Route::get('/complaints', 'getComplaintStatistics');
     Route::get('/payment ', 'getPaymentStatistics');
     Route::get('/pointSystem ', 'getPointSystemStatistics');
+
+    Route::get('/mostRepeatedComplaint', 'getMostRepeatedComplaint');
+    Route::get('bestday', 'bestDay');
+    Route::get('mostComplaintsRegion', 'mostComplaintsRegion');
+    Route::get('LessComplaintsRegion', 'LessComplaintsRegion');
+    Route::get('mostCampaignDonation', 'mostCampaignDonation');
+    Route::get('mostCampaignParticipate', 'mostCampaignParticipate');
+    Route::get('averageExcecutionComplaint', 'averageExcecutionComplaint');
 
 
 

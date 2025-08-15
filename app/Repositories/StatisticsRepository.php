@@ -282,4 +282,115 @@ class StatisticsRepository
         return Complaint::orderByDesc('priority_points')
             ->first(['id', 'title', 'priority_points', 'region', 'status']);
     }
+
+    public function getMostRepeatedComplaint()
+    {
+        $result = Complaint::select('complaint_category_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('complaint_category_id')
+            ->with('category:id,name')
+            ->orderByDesc('count')
+            ->first();
+
+        return [
+            'category' => $result->category->name ?? 'Unknown',
+            'count' => $result->count
+        ];
+    }
+
+    public function getPerformanceByDay()
+    {
+        // Donations per day
+        $donations = DB::table('campaign_donations')
+            ->join('projects', 'campaign_donations.project_id', '=', 'projects.id')
+            ->select(
+                DB::raw('DAYNAME(campaign_donations.donated_at) as day'),
+                DB::raw('SUM(amount) as total_donations')
+            )
+            ->where('campaign_donations.status', 'مدفوع') // Specify table name to avoid ambiguous column
+            ->groupBy('day')
+            ->pluck('total_donations', 'day');
+
+        // Volunteers per day (based on project start date)
+        $volunteers = DB::table('campaign_participants')
+            ->join('projects', 'campaign_participants.project_id', '=', 'projects.id')
+            ->select(
+                DB::raw('DAYNAME(projects.execution_date) as day'),
+                DB::raw('COUNT(campaign_participants.id) as total_volunteers')
+            )
+            ->where('campaign_participants.status', 'تمت الموافقة')
+            ->groupBy('day')
+            ->pluck('total_volunteers', 'day');
+
+        return [
+            'donations'  => $donations,
+            'volunteers' => $volunteers,
+        ];
+    }
+
+    public function getMostComplaintsRegion()
+    {
+        $region = Complaint::select('region', DB::raw('COUNT(*) as count'))
+            ->groupBy('region')
+            ->orderByDesc('count')
+            ->first();
+
+            return $region->region ?? 'Unknown';
+    }
+
+    public function getLessComplaintRegion()
+    {
+        $region = Complaint::select('region', DB::raw('COUNT(*) as count'))
+            ->groupBy('region')
+            ->orderBy('count')
+            ->skip(1)
+            ->first();
+
+        return $region->region ?? 'Unknown';
+    }
+
+    public function getMostCampaignDonation()
+    {
+        $category = DB::table('campaign_donations')
+            ->join('projects', 'campaign_donations.project_id', '=', 'projects.id')
+            ->select('projects.category_id', DB::raw('SUM(amount) as total_donated'))
+            ->groupBy('projects.category_id')
+            ->orderByDesc('total_donated')
+            ->first();
+
+        return $category ;
+    }
+
+    public function getMostCampaignParticipate()
+    {
+        $category = DB::table('campaign_participants')
+            ->join('projects', 'campaign_participants.project_id', '=', 'projects.id')
+            ->select('projects.category_id', DB::raw('COUNT(*) as total_participate'))
+            ->groupBy('projects.category_id')
+            ->orderByDesc('total_participate')
+            ->first();
+        return $category;
+    }
+
+    public function getAverageExcecutionComplaint()
+    {
+        return DB::table('complaints as c')
+            ->join('complaint_status_durations as csd', 'c.id', '=', 'csd.complaint_id')
+            ->join('complaint_categories as cc', 'c.complaint_category_id', '=', 'cc.id')
+            ->where('c.status', 'منجزة')
+            ->where('csd.status', 'منجزة')
+            ->select(
+                'cc.name as category_name',
+                DB::raw('AVG(TIMESTAMPDIFF(DAY, c.created_at, csd.created_at)) as average_execution_time')
+            )
+            ->groupBy('cc.id', 'cc.name')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category' => $item->category_name,
+                    'average_days' => round($item->average_execution_time, 2)
+                ];
+            });
+    }
+
+
 }

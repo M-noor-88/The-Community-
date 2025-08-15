@@ -10,6 +10,7 @@ enum ComplaintStatus: string
     case Completed = 'منجزة';
     case Rejected = 'مرفوضة';
     case Closed = 'مغلقة';
+    case Assigned = 'تم التعيين';
 
     public static function values(): array
     {

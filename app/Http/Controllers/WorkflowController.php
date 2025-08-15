@@ -206,7 +206,7 @@ class WorkflowController extends Controller
             'agent' => $agent,
         ]);
     }
-    
+
 
     public function canTransition(Request $request, $id)
     {

@@ -205,4 +205,68 @@ class StatisticsController extends Controller
             return $this->error($e->getMessage());
         }
     }
+
+    public function getMostRepeatedComplaint()
+    {
+        try {
+            $mostRepeatedComplaint = $this->statisticsService->getMostRepeatedComplaint();
+            return $this->success($mostRepeatedComplaint, 'Most repeated complaint retrieved successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+     public function bestDay()
+    {
+        try {
+            return $this->success($this->statisticsService->getBestCampaignDay(), 'Best day to publish campaign');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function mostComplaintsRegion()
+    {
+        try {
+            return $this->success($this->statisticsService->getMostComplaintsRegion(), 'Most complaints region retrieved successfully');
+        } catch (Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function LessComplaintsRegion()
+    {
+        try{
+            return $this->success($this->statisticsService->getLessComplaintRegion(), 'Less complaint region retrieved successfully');
+        }catch (Exception $e){
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function mostCampaignDonation()
+    {
+        try{
+            return $this->success($this->statisticsService->getMostCampaignDonation(), 'Most campaign donation retrieved successfully');
+        }catch (Exception $e){
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function mostCampaignParticipate()
+    {
+        try{
+            return $this->success($this->statisticsService->getMostCampaignParticipate(), 'Most campaign participate retrieved successfully');
+        }catch (Exception $e){
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function averageExcecutionComplaint()
+    {
+        try{
+            return $this->success($this->statisticsService->getAverageExcecutionComplaint(), 'Average excecution time for complaints ');
+        }catch (Exception $e){
+            return $this->error($e->getMessage());
+        }
+    }
 }

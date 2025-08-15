@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 
-Schedule::command('complaints:update-scores')->daily();
+Schedule::command('complaints:update-scores')->hourly();
