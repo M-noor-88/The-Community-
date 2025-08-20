@@ -48,9 +48,6 @@ class ComplaintsController extends Controller
         try {
             $filters = $request->only(['status', 'category_id', 'region']);
             $complaints = $this->complaintsService->filterComplaintsAdmin($filters);
-            if ($complaints['complaints']->isEmpty()) {
-                return $this->success('No complaints found', 204);
-            }
 
             return $this->success($complaints, 'Complaints retrieved successfully');
         } catch (\Throwable $e) {
@@ -115,7 +112,7 @@ class ComplaintsController extends Controller
     public function updateCategory(ComplaintCategoryRequest $request, $id): JsonResponse
     {
         try {
-            $complaints = $this->complaintsService->updateComplaintCategory($id, $request['name']);
+            $complaints = $this->complaintsService->updateComplaintCategory($id, $request['name'],$request['points']);
 
             return $this->success($complaints, 'category updated successfully');
         } catch (Exception $e) {

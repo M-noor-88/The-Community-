@@ -8,19 +8,26 @@ use App\Services\Workflow\ComplaintWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use App\Services\ComplaintsService;
+use App\Http\Requests\UpdateComplaintRequest;
 
 class WorkflowController extends Controller
 {
     /**
      * @throws ValidationException
      */
-    public function changeStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|string',
-            'notes' => 'nullable|string'
-        ]);
 
+     protected ComplaintsService $complaintsService;
+
+
+    public function __construct(ComplaintsService $complaintsService)
+    {
+        $this->complaintsService = $complaintsService;
+    }
+
+
+    public function changeStatus(UpdateComplaintRequest $request, $id)
+    {
         $complaint = Complaint::findOrFail($id);
         $workflow = new ComplaintWorkflowService();
 
@@ -32,35 +39,10 @@ class WorkflowController extends Controller
             $workflow->assignToRandomAgent($complaint);
         }
 
+        $this->complaintsService->updateComplaintStatus($id, $request->all());
+
         return response()->json(['message' => 'تم تغيير حالة الشكوى بنجاح']);
     }
-
-
-    public function index(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $user = Auth::user();
-
-        $complaints = Complaint::with('category')
-            ->latest()
-            ->take(50)
-            ->get();
-
-        $response = $complaints->map(function ($complaint) {
-            return [
-                'id' => $complaint->id,
-                'title' => $complaint->title,
-                'region' => $complaint->region,
-                'status' => $complaint->status,
-                'category' => $complaint->category?->name,
-                'priority'=> $complaint->priority_points,
-                'created_at' => $complaint->created_at->format('Y-m-d H:i'),
-            ];
-        });
-
-        return response()->json($response);
-    }
-
-
 
 
     public function show($id): \Illuminate\Http\JsonResponse
@@ -68,25 +50,7 @@ class WorkflowController extends Controller
         $complaint = Complaint::with(['category', 'user', 'assignedAgent', 'workflowLogs.user', 'statusDurations'])
             ->findOrFail($id);
 
-        $mappedComplaint = [
-            'id' => $complaint->id,
-            'title' => $complaint->title,
-            'description' => $complaint->description,
-            'region' => $complaint->region,
-            'status' => $complaint->status,
-            'priority_points' => $complaint->priority_points,
-            'created_at' => $complaint->created_at->format('Y-m-d H:i'),
-            'last_status_changed_at' => optional($complaint->last_status_changed_at)->format('Y-m-d H:i'),
-            'category' => $complaint->category?->name,
-            'user' => [
-                'id' => $complaint->user->id,
-                'name' => $complaint->user->name,
-            ],
-            'assigned_agent' => $complaint->assignedAgent ? [
-                'id' => $complaint->assignedAgent->id,
-                'name' => $complaint->assignedAgent->name,
-            ] : null,
-        ];
+        $all_complaints = $this->complaintsService->getComplaintsByID($id);
 
         $logs = $complaint->workflowLogs->map(function ($log) {
             return [
@@ -117,7 +81,7 @@ class WorkflowController extends Controller
         });
 
         return response()->json([
-            'complaint' => $mappedComplaint,
+            'complaint' => $all_complaints,
             'workflow_logs' => $logs,
             'status_durations' => $durations,
         ]);
@@ -231,13 +195,6 @@ class WorkflowController extends Controller
         return response()->json($stats);
     }
 
-    public function checkEscalation($id): \Illuminate\Http\JsonResponse
-    {
-        $complaint = Complaint::findOrFail($id);
-        (new ComplaintWorkflowService())->checkAndEscalate($complaint);
-
-        return response()->json(['message' => 'تم التحقق من التصعيد التلقائي لهذه الشكوى.']);
-    }
 
     public function autoAssign($id): \Illuminate\Http\JsonResponse
     {
@@ -250,11 +207,6 @@ class WorkflowController extends Controller
         ]);
     }
 
-    public function escalated(): \Illuminate\Http\JsonResponse
-    {
-        $complaints = Complaint::where('status', 'تم التصعيد')->latest()->get();
-        return response()->json($complaints);
-    }
 
     public function canTransition(Request $request, $id)
     {

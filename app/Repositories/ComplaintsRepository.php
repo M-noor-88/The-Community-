@@ -126,10 +126,15 @@ class ComplaintsRepository
         ]);
     }
 
-    public function updateComplaintCategory($id, $name): ComplaintCategory
+    public function updateComplaintCategory($id, $name, $points = null): ComplaintCategory
     {
         $category = ComplaintCategory::findOrFail($id);
-        $category->name = $name;
+        if($name){
+            $category->name = $name;
+        }
+        if($points){
+            $category->points = $points;
+        }
         $category->save();
 
         return $category;

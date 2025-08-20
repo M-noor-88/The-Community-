@@ -60,6 +60,7 @@ class VolunteerProfileService
 
         return [
             'name' => $profile->user?->name,
+            'email'=> $profile->user?->email,
             'bio' => $profile->bio,
             'experience_years' => $profile->experience_years,
             'phone' => $profile->phone,

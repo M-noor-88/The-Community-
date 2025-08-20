@@ -53,7 +53,7 @@ class ComplaintsService
         return $this->getResponseDetails($FullConlaints);
     }
 
-    public function filterComplaintsAdmin(array $filters): array
+    public function filterComplaintsAdmin(array $filters)
     {
         $complaints = $this->complaintsRepo->applyCommonFilters($filters);
         $complaints = $complaints->orderByDesc('priority_points')->get();
@@ -61,12 +61,11 @@ class ComplaintsService
             return new ComplaintResource($complaint);
         });
 
-        return $this->getResponseDetails($FullConlaints);
+        return $FullConlaints;
     }
 
     public function createComplaint(array $request): array
     {
-
         $complaintImages = $request['complaintImages'] ?? [];
         $attachedImageIds = [];
         $title = $request['title'];
@@ -87,7 +86,6 @@ class ComplaintsService
                 throw new Exception('User not authenticated.');
             }
 
-            $points=$this->pointsService->calculate($title, $description, $area, $categoryId);
 
             $complaint = $this->complaintsRepo->create([
                 'user_id' => $user->id,
@@ -97,8 +95,10 @@ class ComplaintsService
                 'title' => $title,
                 'description' => $description ?? null,
                 'status' => 'انتظار',
-                'priority_points' => $points,
+                'priority_points' => 0,
             ]);
+
+
 
             if (! empty($complaintImages)) {
                 $images = is_array($complaintImages) ? $complaintImages : [$complaintImages];
@@ -108,6 +108,11 @@ class ComplaintsService
                     $complaint->complaintImages()->attach($attachedImageIds, ['type' => 'complaint']);
                 }
             }
+
+            $points=$this->pointsService->calculate($complaint->id);
+            $complaint['priority_points']=$points;
+            $complaint->save();
+
             DB::commit();
 
             return ['complaint' => new ComplaintResource($complaint)];
@@ -151,7 +156,9 @@ class ComplaintsService
             $owner = $complaint->user;
             if ($complaint->status == 'مرفوضة' && !empty($request['rejection_reason'])) {
                 $body = "تم رفض الشكوى '{$complaint->title}' وذلك بسبب: {$request['rejection_reason']}.";
-            } else {
+            } else if($complaint->status == 'مرفوضة' ){
+                $body = "تم رفض الشكوى '{$complaint->title}' ";
+            }else{
                 $body = "تم تحديث الشكوى '{$complaint->title}' إلى الحالة: {$status}.";
             }
 
@@ -166,7 +173,11 @@ class ComplaintsService
             }
             $complaint->update([
                 'status' => $status,
+                'last_status_changed_at' => now(),
+
             ]);
+
+
             DB::commit();
 
             return ['complaint' => new ComplaintResource($complaint)];
@@ -217,9 +228,9 @@ class ComplaintsService
         return $this->complaintsRepo->createComplaintCategory($name, $points);
     }
 
-    public function updateComplaintCategory($id, $name): ComplaintCategory
+    public function updateComplaintCategory($id, $name, $points = null): ComplaintCategory
     {
-        return $this->complaintsRepo->updateComplaintCategory($id, $name);
+        return $this->complaintsRepo->updateComplaintCategory($id, $name, $points);
     }
 
     public function deleteComplaintCategory($id): void
@@ -264,4 +275,7 @@ class ComplaintsService
     {
         return $this->locationRepo->getAllRegion();
     }
+
+
+
 }
