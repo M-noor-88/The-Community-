@@ -26,7 +26,8 @@ class UpdateComplaintRequest extends FormRequest
             'achievementImages' => 'nullable|array',
             'achievementImages.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:5120', // 5MB max
             'status' => 'required|string',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
+            'agent_id' => 'nullable|exists:users,id',
         ];
     }
 }

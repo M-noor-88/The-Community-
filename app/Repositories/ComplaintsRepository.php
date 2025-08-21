@@ -32,6 +32,7 @@ class ComplaintsRepository
     public function applyCommonFilters(array $filters): Builder
     {
         $query = Complaint::query();
+        $user = Auth::user();
 
         if (! empty($filters['status'])) {
             if (! ComplaintStatus::isValid($filters['status'])) {
@@ -61,6 +62,12 @@ class ComplaintsRepository
             }
             $query->where('user_id', $userId);
         }
+
+        if ($user->hasRole('field_agent') && !empty($filters['status']) &&($filters['status']=='يتم التنفيذ'|| $filters['status']=='تم التعيين')) {
+            $query->where('assigned_to', $user->id);
+        }
+
+
 
         return $query;
     }

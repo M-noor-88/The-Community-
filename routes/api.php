@@ -237,9 +237,7 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
 });
 
 Route::middleware(['role:client'])
-->middleware('auth:sanctum')
-->prefix('Donation')->controller(DonationController::class)
-->group(function () {
+->middleware('auth:sanctum')->controller(DonationController::class)->group(function () {
     Route::post('/donate',  'donate');
 });
 
@@ -262,7 +260,7 @@ Route::middleware('auth:sanctum')->get('/notifications', [NotificationController
 
 Route::middleware(['auth:sanctum'])->group(function () {
     // Route::get('/complaints', [WorkflowController::class, 'index']);
-    Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
+    // Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
     Route::get('/complaints/{id}/logs', [WorkflowController::class, 'logs']);
     Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);
     Route::post('/complaints/{id}/assign', [WorkflowController::class, 'assignToFieldAgent']);
@@ -274,16 +272,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     // 📄 استعراض كل الشكاوى حسب الدور
-    Route::get('/complaints', [WorkflowController::class, 'index']);
+    // Route::get('/complaints', [WorkflowController::class, 'index']);
 
     // 📄 تفاصيل شكوى واحدة
-    Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
+    // Route::get('/complaints/{id}', [WorkflowController::class, 'show']);
 
     // 📝 تغيير حالة الشكوى
     Route::post('/complaints/{id}/status', [WorkflowController::class, 'changeStatus']);
 
     // 📜 سجل التحركات (اللوغ)
     Route::get('/complaints/{id}/logs', [WorkflowController::class, 'logs']);
+
+
 
     // 🤖 تعيين موظف ميداني تلقائيًا
     Route::post('/complaints/{id}/auto-assign', [WorkflowController::class, 'autoAssign']);
@@ -299,6 +299,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ❓ هل يملك الدور صلاحية تغيير الحالة
     Route::get('complaints/{id}/available-transitions', [WorkflowController::class, 'availableTransitions']);
+
+    // 👥 عرض جميع موظفين الميدان
+    Route::get('/field-agents', [WorkflowController::class, 'getAllFieldAgents']);
+
+    // 👥 عرض جميع موظفين الميدان
+    Route::get('/complaints/{id}/durations', [WorkflowController::class, 'getComplaintDurations']);
 
 });
 

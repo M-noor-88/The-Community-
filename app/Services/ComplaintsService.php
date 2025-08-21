@@ -154,13 +154,18 @@ class ComplaintsService
             }
 
             $owner = $complaint->user;
-            if ($complaint->status == 'مرفوضة' && !empty($request['rejection_reason'])) {
-                $body = "تم رفض الشكوى '{$complaint->title}' وذلك بسبب: {$request['rejection_reason']}.";
-            } else if($complaint->status == 'مرفوضة' ){
-                $body = "تم رفض الشكوى '{$complaint->title}' ";
-            }else{
-                $body = "تم تحديث الشكوى '{$complaint->title}' إلى الحالة: {$status}.";
+            if ($status == 'مرفوضة' && !empty($request['rejection_reason'])) {
+                $message = "    تم رفض الشكوى: {$complaint->title}   سبب الرفض: {$request['rejection_reason']}";
+            } else if($status == 'مرفوضة') {
+                $message = "تم رفض الشكوى: {$complaint->title}";
+            } else if($status == 'منجزة') {
+                $message = "تم معالجة الشكوى: {$complaint->title}";
+            } else if($status == 'تم التعيين') {
+                $message = "تمت الموافقة على الشكوى وتعيين المشرف الميداني المناسب : {$complaint->title}";
+            } else if($status == 'يتم التنفيذ') {
+                $message = "جاري معالجة الشكوى: {$complaint->title}";
             }
+
 
 
             if ($owner && $owner->device_token) {
@@ -168,19 +173,20 @@ class ComplaintsService
                     $owner->id,
                     $owner->device_token,
                     'تحديث حالة الشكوى المقدمة',
-                    $body,
+                    $message,
                 );
             }
             $complaint->update([
                 'status' => $status,
                 'last_status_changed_at' => now(),
-
             ]);
 
 
             DB::commit();
 
-            return ['complaint' => new ComplaintResource($complaint)];
+            return ['complaint' => new ComplaintResource($complaint),
+                    'message'=>$message
+                ];
         } catch (\Exception $e) {
             foreach ($attachedImageIds as $imageId) {
                 $this->imageRepo->deleteImagePlaceholder($imageId);
@@ -275,6 +281,7 @@ class ComplaintsService
     {
         return $this->locationRepo->getAllRegion();
     }
+
 
 
 
