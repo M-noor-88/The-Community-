@@ -26,6 +26,19 @@ class WorkflowController extends Controller
     }
 
 
+
+     protected function translateRole($role)
+    {
+        $roles = [
+            'government_admin' => 'مسؤول حكومي',
+            'field_agent' => 'مندوب ميداني',
+            'complaint_manager' => 'مدير الشكاوى'
+        ];
+
+        return $roles[$role] ?? $role;
+    }
+
+
     public function changeStatus(UpdateComplaintRequest $request, $id)
     {
         $complaint = Complaint::findOrFail($id);
@@ -36,12 +49,12 @@ class WorkflowController extends Controller
 
         // إذا كانت الحالة الجديدة "تم التعيين" → نفذ تعيين الموظف تلقائيًا
         if ($request->status === 'تم التعيين') {
-            $workflow->assignToRandomAgent($complaint);
+            $workflow->assignToAgent($complaint, $request->agent_id);
         }
 
-        $this->complaintsService->updateComplaintStatus($id, $request->all());
+        $result= $this->complaintsService->updateComplaintStatus($id, $request->all());
 
-        return response()->json(['message' => 'تم تغيير حالة الشكوى بنجاح']);
+        return response()->json(['message' => $result['message']]);
     }
 
 
@@ -82,8 +95,8 @@ class WorkflowController extends Controller
 
         return response()->json([
             'complaint' => $all_complaints,
-            'workflow_logs' => $logs,
-            'status_durations' => $durations,
+             'workflow_logs' => $logs,
+            // 'status_durations' => $durations,
         ]);
     }
 
@@ -107,7 +120,9 @@ class WorkflowController extends Controller
                     'status_change' => "{$log->from_status} → {$log->to_status}",
                     'changed_by' => [
                         'id' => $log->changed_by,
-                        'role' => $this->translateRole($log->role)
+                        'name' => $log->user->name,
+                        'Arabic_role' => $this->translateRole($log->role),
+                        'English_role' => $log->role,
                     ],
                     'notes' => $log->notes,
                     'date' => $this->formatDate($log->created_at, true)
@@ -138,16 +153,7 @@ class WorkflowController extends Controller
         return "{$formats['day']}، {$formats['gregorian']} - {$formats['time']}";
     }
 
-    protected function translateRole($role)
-    {
-        $roles = [
-            'government_admin' => 'مسؤول حكومي',
-            'field_agent' => 'مندوب ميداني',
-            'complaint_manager' => 'مدير الشكاوى'
-        ];
 
-        return $roles[$role] ?? $role;
-    }
 
     protected function getActionDescription($fromStatus, $toStatus)
     {
@@ -240,5 +246,32 @@ class WorkflowController extends Controller
             'allowed_transitions' => array_values($allowed)
         ]);
     }
+
+    public function getAllFieldAgents()
+    {
+        $fieldAgents = User::role('field_agent')->select('id', 'name', 'email')->get();
+        return response()->json($fieldAgents);
+    }
+
+    public function getComplaintDurations($id)
+    {
+        $complaint = Complaint::findOrFail($id);
+        $durations = $complaint->statusDurations->map(function ($duration) {
+            $entered = \Carbon\Carbon::parse($duration->entered_at);
+            $left = $duration->left_at ? \Carbon\Carbon::parse($duration->left_at) : now();
+
+            return [
+                'status' => $duration->status,
+                'entered_at' => $entered->format('Y-m-d H:i'),
+                'left_at' => $duration->left_at ? $left->format('Y-m-d H:i') : '',
+                'duration_readable' => $entered->diffForHumans($left, true),
+            ];
+        });
+
+        return response()->json($durations);
+    }
+
+
+
 
 }

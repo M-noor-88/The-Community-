@@ -334,7 +334,10 @@ class StatisticsRepository
             ->orderByDesc('count')
             ->first();
 
-            return $region->region ?? 'Unknown';
+        return [
+            'region' => $region->region,
+            'count' => $region->count,
+        ];
     }
 
     public function getLessComplaintRegion()
@@ -345,7 +348,10 @@ class StatisticsRepository
             ->skip(1)
             ->first();
 
-        return $region->region ?? 'Unknown';
+        return [
+            'region' => $region->region,
+            'count' => $region->count,
+        ];
     }
 
     public function getMostCampaignDonation()

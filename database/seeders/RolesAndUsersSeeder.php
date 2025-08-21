@@ -113,7 +113,7 @@ foreach ($arabicClients as $clientData) {
 
         // Create Government Admin
         User::factory()->create([
-            'name'=> 'أدمن المحافظة',
+            'name'=> 'عامر عبدالعزيز',
             'email' => 'govadmin@example.com',
             'password' => Hash::make('password'),
         ])->assignRole('government_admin');

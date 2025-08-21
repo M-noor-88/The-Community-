@@ -48,8 +48,10 @@ class ComplaintsController extends Controller
         try {
             $filters = $request->only(['status', 'category_id', 'region']);
             $complaints = $this->complaintsService->filterComplaintsAdmin($filters);
+            $role = auth()->user()->roles->first()->name;
 
-            return $this->success($complaints, 'Complaints retrieved successfully');
+
+            return $this->success($complaints, $role);
         } catch (\Throwable $e) {
             return $this->error($e->getMessage(), 500);
         }

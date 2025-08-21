@@ -126,19 +126,19 @@ class ComplaintWorkflowService
             ->toArray();
     }
 
-    public function assignToRandomAgent(Complaint $complaint): array
+    public function assignToAgent(Complaint $complaint, ?int $agentId = null): array
     {
-        $agent = \App\Models\User::role('field_agent')->inRandomOrder()->first();
+        $agent = \App\Models\User::role('field_agent')->find($agentId);
 
         if (!$agent) {
             throw ValidationException::withMessages(['assigned_to' => 'لا يوجد موظف ميداني متاح حالياً']);
         }
 
-        $complaint->update(['assigned_to' => $agent->id]);
+        $complaint->update(['assigned_to' => $agentId]);
 
         return [
             'agent_name' => $agent->name,
-            'agent_id' => $agent->id,
+            'agent_id' => $agentId,
         ];
     }
 }
