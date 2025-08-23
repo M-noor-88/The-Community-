@@ -164,6 +164,8 @@ class ComplaintsService
                 $message = "تمت الموافقة على الشكوى وتعيين المشرف الميداني المناسب : {$complaint->title}";
             } else if($status == 'يتم التنفيذ') {
                 $message = "جاري معالجة الشكوى: {$complaint->title}";
+            }else if ($status == "تم التحقق") {
+                $message = "تم التحقق من الشكوى: {$complaint->title}";
             }
 
 

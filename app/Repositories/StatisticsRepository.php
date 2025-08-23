@@ -115,26 +115,50 @@ class StatisticsRepository
 
     public function getMonthlyCounts()
     {
-        return DB::table('projects')
+        // Get all months from projects
+        $projectMonths = DB::table('projects')
             ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month")
-            ->selectRaw("SUM(type = 'حملة رسمية') as official_campaigns")
-            ->selectRaw("SUM(type = 'مبادرة') as initiatives")
+            ->groupBy('month');
+
+        // Get all months from complaints
+        $complaintMonths = DB::table('complaints')
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month")
+            ->groupBy('month');
+
+        // Union to combine both sources of months
+        $allMonths = $projectMonths->union($complaintMonths);
+
+        // Wrap in subquery to avoid "union group by" issues
+        $months = DB::table(DB::raw("({$allMonths->toSql()}) as months"))
+            ->mergeBindings($allMonths)
+            ->select('month')
             ->groupBy('month')
             ->orderBy('month')
-            ->get()
-            ->map(function ($row) {
-                $complaintsCount = DB::table('complaints')
-                    ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$row->month])
-                    ->count();
+            ->get();
 
-                return [
-                    'month' => $row->month,
-                    'official_campaigns' => (int) $row->official_campaigns,
-                    'initiatives' => (int) $row->initiatives,
-                    'complaints' => $complaintsCount,
+        // For each month, collect stats
+        return $months->map(function ($row) {
+            $officialCampaigns = DB::table('projects')
+                ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$row->month])
+                ->where('type', 'حملة رسمية')
+                ->count();
 
-                ];
-            });
+            $initiatives = DB::table('projects')
+                ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$row->month])
+                ->where('type', 'مبادرة')
+                ->count();
+
+            $complaints = DB::table('complaints')
+                ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$row->month])
+                ->count();
+
+            return [
+                'month' => $row->month,
+                'official_campaigns' => $officialCampaigns,
+                'initiatives' => $initiatives,
+                'complaints' => $complaints,
+            ];
+        });
     }
 
     public function getNumberStatusProjects()
