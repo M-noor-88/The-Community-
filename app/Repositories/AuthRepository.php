@@ -75,7 +75,7 @@ class AuthRepository
     {
         $credentials = $request->only('email', 'password');
         if (! Auth::attempt($credentials)) {
-            throw new Exception('هناك خطأ في كلمة السر أو الإيميل');
+            throw new Exception('Invalid credentials');
         }
 
         $user = User::where('id', Auth::id())->first();
