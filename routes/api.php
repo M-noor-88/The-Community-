@@ -238,7 +238,7 @@ Route::prefix('statistics')->controller(StatisticsController::class)->group(func
 
 Route::middleware(['role:client'])
 ->middleware('auth:sanctum')->controller(DonationController::class)->group(function () {
-    Route::post('/donate',  'donate');
+    Route::post('/Donation/donate',  'donate');
 });
 
 
