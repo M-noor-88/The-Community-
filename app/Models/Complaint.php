@@ -12,7 +12,7 @@ class Complaint extends Model
 
     protected $fillable = [
         'user_id', 'complaint_category_id', 'location_id', 'assigned_to', 'last_status_changed_at',
-        'title', 'description', 'status','region', 'priority_points'
+        'title', 'description', 'status','region', 'priority_points','rejection_reason'
     ];
 
     public function user(): BelongsTo

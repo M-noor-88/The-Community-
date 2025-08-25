@@ -60,6 +60,7 @@ class ComplaintsController extends Controller
     public function store(ComplaintRequest $request): JsonResponse
     {
         try {
+            $this->complaintsService->checkComplaintValidation();
             $complaint = $this->complaintsService->createComplaint($request->all());
 
             return $this->success($complaint, 'Complaint created successfully', 201);

@@ -29,6 +29,7 @@ return new class extends Migration
                 'مغلقة',        // closed
                 'مرفوضة',       // rejected
             ])->default('انتظار');
+            $table->text('rejection_reason')->nullable();
             $table->timestamps();
         });
     }

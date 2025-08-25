@@ -167,4 +167,20 @@ class ComplaintsRepository
             ->count();
     }
 
+    public function getComplaintCountForUser(): int
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            throw new \Exception('User not authenticated.');
+        }
+
+        return Complaint::where('user_id', $user->id)
+            ->whereBetween('created_at', [
+                now()->startOfWeek(),
+                now()->endOfWeek()
+            ])
+            ->count();
+    }
+
 }

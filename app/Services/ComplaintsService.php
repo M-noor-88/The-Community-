@@ -94,7 +94,7 @@ class ComplaintsService
                 'area' => $request['area'] ,
                 'title' => $title,
                 'description' => $description ?? null,
-                'status' => 'انتظار',
+                'status' => 'تم التحقق',
                 'priority_points' => 0,
             ]);
 
@@ -181,6 +181,7 @@ class ComplaintsService
             $complaint->update([
                 'status' => $status,
                 'last_status_changed_at' => now(),
+                'rejection_reason' => $request['rejection_reason'] ?? null,
             ]);
 
 
@@ -282,6 +283,15 @@ class ComplaintsService
     public function getAllRegions()
     {
         return $this->locationRepo->getAllRegion();
+    }
+
+    public function checkComplaintValidation()
+    {
+        $complaintcountforuser = $this->complaintsRepo->getComplaintCountForUser();
+        if($complaintcountforuser >= 1) {
+            throw new \Exception('You can only create one complaint per week.');
+        }
+
     }
 
 
