@@ -313,3 +313,5 @@ Route::get('/projects/{id}/related', [ProjectController::class, 'related']);
 
 // Delete User
 Route::middleware('auth:sanctum')->delete('/user/delete', [AuthController::class, 'destroy']);
+
+Route::middleware(['auth:sanctum'])->post('/admin/create/agent' , [AuthController::class , 'createAdmin'])->middleware(['role:government_admin']);

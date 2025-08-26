@@ -30,7 +30,7 @@ class ComplaintStatusDurationsSeeder extends Seeder
             ['id'=>32,'complaint_id'=>5,'status'=>'يتم التنفيذ','entered_at'=>'2025-08-14 07:15:30','left_at'=>null,'created_at'=>'2025-08-14 07:15:30','updated_at'=>'2025-08-14 07:15:30'],
             ['id'=>33,'complaint_id'=>1,'status'=>'منجزة','entered_at'=>'2025-08-14 07:19:01','left_at'=>null,'created_at'=>'2025-08-14 07:19:01','updated_at'=>'2025-08-14 07:19:01'],
             ['id'=>34,'complaint_id'=>3,'status'=>'منجزة','entered_at'=>'2025-08-14 10:23:12','left_at'=>'2025-08-14 07:23:12','created_at'=>'2025-08-14 07:22:32','updated_at'=>'2025-08-14 07:23:12'],
-            ['id'=>35,'complaint_id'=>3,'status'=>'مغلقة','entered_at'=>'2025-08-14 07:23:12','left_at'=>null,'created_at'=>'2025-08-14 07:23:12','updated_at'=>'2025-08-14 07:23:12'],
+            ['id'=>35,'complaint_id'=>3,'status'=>'منجزة','entered_at'=>'2025-08-14 07:23:12','left_at'=>null,'created_at'=>'2025-08-14 07:23:12','updated_at'=>'2025-08-14 07:23:12'],
             ['id'=>36,'complaint_id'=>11,'status'=>'تم التعيين','entered_at'=>'2025-08-24 22:25:28','left_at'=>'2025-08-24 19:25:28','created_at'=>'2025-08-24 19:21:27','updated_at'=>'2025-08-24 19:25:28'],
             ['id'=>37,'complaint_id'=>12,'status'=>'تم التعيين','entered_at'=>'2025-08-24 19:21:36','left_at'=>null,'created_at'=>'2025-08-24 19:21:36','updated_at'=>'2025-08-24 19:21:36'],
             ['id'=>38,'complaint_id'=>1,'status'=>'تم التعيين','entered_at'=>'2025-08-24 22:23:53','left_at'=>'2025-08-24 19:23:53','created_at'=>'2025-08-24 19:21:44','updated_at'=>'2025-08-24 19:23:53'],

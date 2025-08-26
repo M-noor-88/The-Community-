@@ -114,6 +114,7 @@ class DonationService
         $result = $donations->map(function ($donation) {
             return [
                 'id' => $donation->id,
+                'project_name' => $donation->project->title ?? "اسم المشروع",
                 'user_id' => $donation->user_id,
                 'user_name' => $donation->user->name ?? 'Unknown',
                 'project_id' => $donation->project_id,

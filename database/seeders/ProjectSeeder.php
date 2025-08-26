@@ -15,7 +15,7 @@ class ProjectSeeder extends Seeder
         $projects = [
             [
                 'id' => 3,
-                'user_id' => 8,
+                'user_id' => 5,
                 'image_id' => 27,
                 'category_id' => 1,
                 'location_id' => 12,
@@ -26,14 +26,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 10:52:22',
-                'updated_at' => '2025-06-11 10:52:22',
+                'created_at' => '2025-08-11 10:52:22',
+                'updated_at' => '2025-08-11 10:52:22',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 4,
-                'user_id' => 8,
+                'user_id' => 6,
                 'image_id' => 28,
                 'category_id' => 1,
                 'location_id' => 13,
@@ -51,7 +51,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'id' => 5,
-                'user_id' => 8,
+                'user_id' => 7,
                 'image_id' => 29,
                 'category_id' => 1,
                 'location_id' => 14,
@@ -69,7 +69,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'id' => 6,
-                'user_id' => 8,
+                'user_id' => 4,
                 'image_id' => 30,
                 'category_id' => 1,
                 'location_id' => 15,
@@ -87,7 +87,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'id' => 7,
-                'user_id' => 8,
+                'user_id' => 6,
                 'image_id' => 31,
                 'category_id' => 1,
                 'location_id' => 16,
@@ -98,14 +98,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:10:13',
-                'updated_at' => '2025-06-11 11:10:13',
+                'created_at' => '2025-07-11 11:10:13',
+                'updated_at' => '2025-07-11 11:10:13',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 8,
-                'user_id' => 8,
+                'user_id' => 7,
                 'image_id' => 32,
                 'category_id' => 1,
                 'location_id' => 17,
@@ -134,14 +134,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:16:28',
-                'updated_at' => '2025-06-11 11:16:28',
+                'created_at' => '2025-05-11 11:16:28',
+                'updated_at' => '2025-05-11 11:16:28',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 10,
-                'user_id' => 8,
+                'user_id' => 4,
                 'image_id' => 34,
                 'category_id' => 2,
                 'location_id' => 19,
@@ -152,14 +152,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:20:04',
-                'updated_at' => '2025-06-11 11:20:04',
+                'created_at' => '2025-04-11 11:20:04',
+                'updated_at' => '2025-04-11 11:20:04',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 11,
-                'user_id' => 8,
+                'user_id' => 4,
                 'image_id' => 35,
                 'category_id' => 2,
                 'location_id' => 20,
@@ -170,14 +170,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:24:55',
-                'updated_at' => '2025-06-11 11:24:55',
+                'created_at' => '2025-07-11 11:24:55',
+                'updated_at' => '2025-07-11 11:24:55',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 12,
-                'user_id' => 8,
+                'user_id' => 10,
                 'image_id' => 36,
                 'category_id' => 2,
                 'location_id' => 21,
@@ -188,14 +188,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:29:17',
-                'updated_at' => '2025-06-11 11:29:17',
+                'created_at' => '2025-07-11 11:29:17',
+                'updated_at' => '2025-07-11 11:29:17',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 13,
-                'user_id' => 8,
+                'user_id' => 9,
                 'image_id' => 37,
                 'category_id' => 2,
                 'location_id' => 22,
@@ -213,7 +213,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'id' => 14,
-                'user_id' => 8,
+                'user_id' => 10,
                 'image_id' => 38,
                 'category_id' => 2,
                 'location_id' => 23,
@@ -231,7 +231,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'id' => 15,
-                'user_id' => 8,
+                'user_id' => 11,
                 'image_id' => 39,
                 'category_id' => 2,
                 'location_id' => 24,
@@ -249,7 +249,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'id' => 16,
-                'user_id' => 8,
+                'user_id' => 9,
                 'image_id' => 40,
                 'category_id' => 3,
                 'location_id' => 25,
@@ -267,7 +267,7 @@ class ProjectSeeder extends Seeder
             ],
             [
                 'id' => 17,
-                'user_id' => 8,
+                'user_id' => 10,
                 'image_id' => 41,
                 'category_id' => 3,
                 'location_id' => 26,
@@ -278,14 +278,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:52:39',
-                'updated_at' => '2025-06-11 11:52:39',
+                'created_at' => '2025-05-11 11:52:39',
+                'updated_at' => '2025-05-11 11:52:39',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 18,
-                'user_id' => 8,
+                'user_id' => 11,
                 'image_id' => 42,
                 'category_id' => 3,
                 'location_id' => 27,
@@ -296,14 +296,14 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:55:15',
-                'updated_at' => '2025-06-11 11:55:15',
+                'created_at' => '2025-08-11 11:55:15',
+                'updated_at' => '2025-08-11 11:55:15',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
             [
                 'id' => 19,
-                'user_id' => 8,
+                'user_id' => 5,
                 'image_id' => 43,
                 'category_id' => 3,
                 'location_id' => 28,
@@ -314,8 +314,8 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 11:58:16',
-                'updated_at' => '2025-06-11 11:58:16',
+                'created_at' => '2025-05-11 11:58:16',
+                'updated_at' => '2025-05-11 11:58:16',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
@@ -332,8 +332,8 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:01:08',
-                'updated_at' => '2025-06-11 12:01:08',
+                'created_at' => '2025-08-11 12:01:08',
+                'updated_at' => '2025-08-11 12:01:08',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ],
@@ -350,9 +350,9 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:04:15',
-                'updated_at' => '2025-06-11 12:04:15',
-                'is_promoted' => 0,
+                'created_at' => '2025-07-11 12:04:15',
+                'updated_at' => '2025-07-11 12:04:15',
+                'is_promoted' => 1,
                 'is_archived' => 0
             ],
             [
@@ -368,9 +368,9 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:07:14',
-                'updated_at' => '2025-06-11 12:07:14',
-                'is_promoted' => 0,
+                'created_at' => '2025-07-11 12:07:14',
+                'updated_at' => '2025-07-11 12:07:14',
+                'is_promoted' => 1,
                 'is_archived' => 0
             ],
             [
@@ -386,9 +386,9 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:09:56',
-                'updated_at' => '2025-06-11 12:09:56',
-                'is_promoted' => 0,
+                'created_at' => '2025-05-11 12:09:56',
+                'updated_at' => '2025-05-11 12:09:56',
+                'is_promoted' => 1,
                 'is_archived' => 0
             ],
             [
@@ -404,9 +404,9 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:14:57',
-                'updated_at' => '2025-06-11 12:14:57',
-                'is_promoted' => 0,
+                'created_at' => '2025-08-11 12:14:57',
+                'updated_at' => '2025-08-11 12:14:57',
+                'is_promoted' => 1,
                 'is_archived' => 0
             ],
             [
@@ -422,9 +422,9 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:17:22',
-                'updated_at' => '2025-06-11 12:17:22',
-                'is_promoted' => 0,
+                'created_at' => '2025-07-11 12:17:22',
+                'updated_at' => '2025-07-11 12:17:22',
+                'is_promoted' => 1,
                 'is_archived' => 0
             ],
             [
@@ -440,9 +440,9 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:20:13',
-                'updated_at' => '2025-06-11 12:20:13',
-                'is_promoted' => 0,
+                'created_at' => '2025-05-11 12:20:13',
+                'updated_at' => '2025-05-11 12:20:13',
+                'is_promoted' => 1,
                 'is_archived' => 0
             ],
             [
@@ -458,8 +458,8 @@ class ProjectSeeder extends Seeder
                 'type' => 'مبادرة',
                 'status' => 'تصويت',
                 'created_by' => 'user',
-                'created_at' => '2025-06-11 12:25:24',
-                'updated_at' => '2025-06-11 12:25:24',
+                'created_at' => '2025-07-11 12:25:24',
+                'updated_at' => '2025-07-11 12:25:24',
                 'is_promoted' => 0,
                 'is_archived' => 0
             ]
@@ -477,7 +477,7 @@ class ProjectSeeder extends Seeder
             $totalDonated += $amount;
 
             DB::table('projects')->insert([
-                'user_id' => rand(1, 7),
+                'user_id' => rand(1, 12),
                 'image_id' => $project['image_id'],
                 'category_id' => $project['category_id'],
                 'location_id' => $project['location_id'],
@@ -488,14 +488,14 @@ class ProjectSeeder extends Seeder
                 'type' => $type,
                 'status' => $type === 'حملة رسمية' ? (rand(0, 1) ? 'نشطة' : 'منجزة') : 'تصويت',
                 'created_by' => $project['created_by'],
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
+                'created_at' => $project['created_at'],
+                'updated_at' => $project['updated_at'],
                 'is_promoted' => $project['is_promoted'],
                 'is_archived' => $project['is_archived'],
             ]);
         }
 
-      
+
 
     }
 }
