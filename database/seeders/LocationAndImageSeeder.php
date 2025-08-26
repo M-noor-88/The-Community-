@@ -66,6 +66,20 @@ class LocationAndImageSeeder extends Seeder
             ['id' => 50, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1749655217/secure_uploads/images/afb495e5-5a95-40f6-bb95-b88a0105bd25.jpg', 'created_at' => '2025-06-11 12:20:13', 'updated_at' => '2025-06-11 12:20:19'],
             ['id' => 51, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1749655532/secure_uploads/images/36642a4c-fd99-4f50-b9e5-07089867acd9.jpg', 'created_at' => '2025-06-11 12:25:24', 'updated_at' => '2025-06-11 12:25:35'],
 
+            ['id' => 54,'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756075899/secure_uploads/images/673e8859-eaa3-4b3e-9d54-ae82dddd5dfe.jpg','created_at' => '2025-08-24 19:51:36','updated_at' => '2025-08-24 19:51:39',],
+            ['id' => 55, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756075904/secure_uploads/images/13adba79-167a-4c4f-ac09-3f4120399068.jpg',    'created_at' => '2025-08-24 19:51:42',   'updated_at' => '2025-08-24 19:51:45',],
+            ['id' => 56,'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756075919/secure_uploads/images/05beee4d-e43b-42f6-9bad-ebd2c88c6343.jpg','created_at' => '2025-08-24 19:51:54','updated_at' => '2025-08-24 19:51:59',],
+            ['id' => 57,'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756076207/secure_uploads/images/2a7466f1-2a38-47f1-be2f-cd2bb5caa204.jpg','created_at' => '2025-08-24 19:56:43','updated_at' => '2025-08-24 19:56:48',],
+            ['id' => 58,'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756076245/secure_uploads/images/73f2a604-6504-4367-aeeb-184a73ce14be.jpg','created_at' => '2025-08-24 19:57:22','updated_at' => '2025-08-24 19:57:26',],
+            ['id' => 59,'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756076293/secure_uploads/images/0ab509b9-6814-4450-a9f2-e38d63fcae8d.jpg', 'created_at' => '2025-08-24 19:58:08','updated_at' => '2025-08-24 19:58:13',],
+            ['id' =>60, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756118909/secure_uploads/images/0c322fa5-8be1-45af-855c-4b25f4f9001f.jpg', 'created_at' => '2025-08-25 19:58:08','updated_at' => '2025-08-25 19:58:13',],
+            ['id' =>61, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756119513/secure_uploads/images/232d96fc-270c-4be3-af16-26b22e1cef0b.jpg', 'created_at' => '2025-08-25 19:58:08','updated_at' => '2025-08-25 19:58:13',],
+            ['id' =>62, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756124945/secure_uploads/images/13e17662-89c6-41d0-927f-b903cfd6f5f7.jpg', 'created_at' => '2025-08-25 19:58:08','updated_at' => '2025-08-25 19:58:13',],
+            ['id' =>63, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756129102/secure_uploads/images/c324dcb1-60fb-413b-b5f0-7c0b2d668738.jpg', 'created_at' => '2025-08-25 19:58:08','updated_at' => '2025-08-25 19:58:13',],
+            ['id' =>64, 'image_url' => 'https://res.cloudinary.com/df5wyvdtk/image/upload/v1756129505/secure_uploads/images/291cf609-c115-4e50-9816-bc46d3609401.jpg', 'created_at' => '2025-08-25 19:58:08','updated_at' => '2025-08-25 19:58:13',],
+
+
+
         ]);
 
 

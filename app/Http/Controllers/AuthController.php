@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -125,5 +126,31 @@ class AuthController extends Controller
             'status' => true,
             'message' => 'User account and related data deleted successfully.',
         ]);
+    }
+
+    public function createAdmin(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role' => 'required|in:field_agent,complaint_manager',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        // assign role via Spatie
+        $user->assignRole($validated['role']);
+
+
+        return response()->json([
+            'message' => 'Admin created successfully',
+            'data' => $user,
+        ], 201);
+
     }
 }
