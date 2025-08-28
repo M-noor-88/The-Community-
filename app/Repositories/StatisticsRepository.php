@@ -184,6 +184,7 @@ class StatisticsRepository
         return Project::where('type', 'حملة رسمية')
             ->where('status' , 'نشطة')
             ->where('is_archived', false)
+            ->where('is_promoted', false)
             ->with(['user', 'category', 'participants', 'donationSummary'])
             ->withCount('participants')
             ->where('created_at', '<=', now()->subDays(10))

@@ -173,7 +173,7 @@ class ProjectRepository
     }
 
     // Recommendation
-    public function getRecommendations($userID, $status = null, $type = null): LengthAwarePaginator
+    public function getRecommendations($userID, $status = null, $type = null): Collection
     {
         $topCategories = DB::table('user_interests')
             ->where('user_id', $userID)
@@ -200,7 +200,7 @@ class ProjectRepository
             $query->where('type', $type);
         }
 
-        return $query->paginate(50);
+        return $query->inRandomOrder()->limit(50)->get();
 
     }
 
