@@ -150,6 +150,8 @@ Route::middleware(['auth:sanctum'])->prefix('project')->controller(CampaignParti
 
 //------------------------------- governorator admin -------------------------------
 
+Route::get('admin/complaint/download/formalbook/{id}', [ComplaintsController::class,'downloadFormalBook']);
+
 Route::prefix('admin/complaint')
 ->controller(ComplaintsController::class)
 ->middleware('auth:sanctum')
@@ -161,7 +163,6 @@ Route::prefix('admin/complaint')
 
     Route::post('/{id}/updateStatus', 'updateStatus');
     Route::get('/formalbook/{id}', 'getFormalBook');
-    Route::get('/download/formalbook/{id}', 'downloadFormalBook');
 
     /////category
     Route::get('/category/all', 'getAllCategories');
