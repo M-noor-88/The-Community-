@@ -49,8 +49,23 @@ class RolesAndUsersSeeder extends Seeder
         */
 
 
-        // Create Volunteer Admins
-        User::factory(2)->create()->each(function ($user) {
+        // Create Volunteer Admins (specific Arabic teams)
+        $volunteerTeams = [
+            ['name' => 'فريق تطوعي', 'email' => 'volunteer@team.com'],
+        ];
+
+        foreach ($volunteerTeams as $team) {
+            $user = User::create([
+                'name' => $team['name'],
+                'email' => $team['email'],
+                'password' => Hash::make('password'), // Default password
+                'email_verified_at' => now(),
+                'device_token' => Str::random(10),
+                'verification_code' => Str::random(10),
+                'verification_expires_at' => now()->addMinutes(10),
+                'remember_token' => Str::random(10),
+            ]);
+
             $user->assignRole('volunteer_admin');
 
             // Create profile with fake image path
@@ -59,9 +74,10 @@ class RolesAndUsersSeeder extends Seeder
                 'location_id' => 1,
                 'bio' => fake()->text(),
                 'image_id' => 1,
-                'experience_years'=> 3
+                'experience_years' => 3,
             ]);
-        });
+        }
+
 
 
         // Create 5 real Arabic clients
