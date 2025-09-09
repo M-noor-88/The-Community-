@@ -65,7 +65,7 @@ class ComplaintsController extends Controller
             $description = $request->input('description');
 
             if (!AiComplaintClassifier::isValidComplaint($description)) {
-                return $this->error('تم رفض الشكوى', 422);
+                return $this->error('تم رفض الشكوى , يرجى كتابة وصف واضح للشكوى', 422);
             }
 
             $complaint = $this->complaintsService->createComplaint($request->all());
