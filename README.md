@@ -22,9 +22,29 @@
 ---
 Admin Dashboard Overview (Livewire Version , not Completed Yet)
 
-The Initaives with filtering by category , and top voting
+# The Initaives with filtering by category , and top voting - المبادرات المجتمعية
+
 <img width="1920" height="868" alt="1" src="https://github.com/user-attachments/assets/e1ecb3ac-175e-4fd7-b0ae-2d3bf3213d46" />
 <img width="1920" height="869" alt="2" src="https://github.com/user-attachments/assets/0c783fca-001b-48aa-8a1e-3ce64b0ef189" />
+
+---
+
+# Complaint Tracking System - الشكاوي 
+<img width="1914" height="881" alt="7" src="https://github.com/user-attachments/assets/a9a33516-9738-4e7d-8402-5110de1c78d8" />
+<img width="1896" height="897" alt="8" src="https://github.com/user-attachments/assets/0bc6fd59-b2c9-4b5b-9302-69da4c45c24a" />
+<img width="1892" height="859" alt="9" src="https://github.com/user-attachments/assets/3ba862b4-d38e-4576-835b-69358e3f0fbf" />
+<img width="1557" height="861" alt="11" src="https://github.com/user-attachments/assets/9f8d65f2-8eee-4f0b-94d1-7cbe37751ad9" />
+<img width="1567" height="807" alt="10" src="https://github.com/user-attachments/assets/c1b674cb-42d0-4bbb-bd04-749eb9693df1" />
+<img width="1503" height="803" alt="12" src="https://github.com/user-attachments/assets/1d534a6d-2517-4e3e-8c50-923581d21649" />
+
+---
+
+# Campagins - الحملات الرسمية
+
+<img width="1911" height="869" alt="3" src="https://github.com/user-attachments/assets/28028d0b-ebde-465b-9bea-95210ff97aa0" />
+<img width="1920" height="870" alt="4" src="https://github.com/user-attachments/assets/cf18afac-aaec-45f5-89b1-6153e9db566d" />
+<img width="1920" height="875" alt="5" src="https://github.com/user-attachments/assets/5f61bdb5-b3d1-4e37-8b90-9c803158e01e" />
+<img width="1908" height="874" alt="6" src="https://github.com/user-attachments/assets/7fbb269f-1b75-4b91-bd48-c31ce7b60109" />
 
 
 
