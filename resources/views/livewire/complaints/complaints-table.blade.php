@@ -131,7 +131,7 @@
             <div class="relative flex flex-col w-full bg-white dark:bg-gray-800 shadow-sm border border-slate-200 dark:border-gray-700 rounded-lg overflow-hidden">
                 <!-- Image Section -->
                 <div class="relative p-2.5 w-full h-48 shrink-0 overflow-hidden">
-                    @if($complaint->complaintImages()->first()->image_url)
+                    @if(($complaint->complaintImages()->first()->image_url ?? null) != null)
                         <img
                             src="{{ $complaint->complaintImages()->first()->image_url }}"
                             alt="صورة الشكوى"
