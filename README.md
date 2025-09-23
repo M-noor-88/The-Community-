@@ -18,6 +18,16 @@
 
 ---
 
+📊 Dashboard Screenshots
+---
+Admin Dashboard Overview (Livewire Version , not Completed Yet)
+
+The Initaives with filtering by category , and top voting
+<img width="1920" height="868" alt="1" src="https://github.com/user-attachments/assets/e1ecb3ac-175e-4fd7-b0ae-2d3bf3213d46" />
+<img width="1920" height="869" alt="2" src="https://github.com/user-attachments/assets/0c783fca-001b-48aa-8a1e-3ce64b0ef189" />
+
+
+
 ## 🛠️ Tech Stack
 
 - **Framework:** Laravel 11
